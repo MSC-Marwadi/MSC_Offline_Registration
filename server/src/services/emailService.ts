@@ -24,6 +24,29 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
+ * Helper component rendering event perks for Code To Cloud
+ */
+function getEventPerksHTML(): string {
+  return `
+  <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1px solid #3b82f6; border-radius: 12px; padding: 20px; margin: 24px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+    <div style="margin-bottom: 12px;">
+      <span style="font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px;">🎁 What You'll Get at Code To Cloud</span>
+    </div>
+    <div style="font-size: 14px; color: #e2e8f0; line-height: 1.8;">
+      <div style="margin-bottom: 6px;">💰 <strong style="color: #4ade80;">$100 Azure Credit</strong> — Free cloud credit for hands-on deployment</div>
+      <div style="margin-bottom: 6px;">🌐 <strong style="color: #60a5fa;">Build & Deploy Live Site</strong> — Build & deploy your own website on Microsoft Azure</div>
+      <div style="margin-bottom: 6px;">🏆 <strong style="color: #facc15;">Prizes & Awards</strong> — Top scorers win exclusive prizes & swag</div>
+      <div style="margin-bottom: 6px;">📜 <strong style="color: #c084fc;">Official Certificate</strong> — Certificate for all participants</div>
+      <div>📢 <strong style="color: #f472b6;">Official Spotlight</strong> — Opportunity to be featured on official MSC channels</div>
+    </div>
+    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #334155; font-size: 12px; color: #94a3b8; font-style: italic;">
+      💻 <strong>Prerequisites:</strong> No prior cloud experience required! Just bring your curiosity and a charged laptop with VS Code installed.
+    </div>
+  </div>
+  `;
+}
+
+/**
  * Modern Tech Event Email Template Wrapper with Schema.org JSON-LD for Gmail RSVP Cards
  */
 function wrapEmailTemplate(
@@ -79,8 +102,8 @@ function wrapEmailTemplate(
       body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 20px; color: #e2e8f0; }
       .container { max-width: 620px; margin: 0 auto; background-color: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5); border: 1px solid #334155; }
       .hero-header { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0078D4 100%); padding: 32px 28px; text-align: left; border-bottom: 2px solid #00e5ff; }
-      .hero-header h1 { margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px; line-height: 1.3; }
-      .hero-header .subtitle { font-size: 13px; color: #38bdf8; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+      .hero-header h1 { margin: 0; font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.3; }
+      .hero-header .subtitle { font-size: 13px; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
       .content { padding: 32px 28px; line-height: 1.6; color: #f1f5f9; }
       .badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); margin-bottom: 20px; }
       .badge-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
@@ -102,15 +125,15 @@ function wrapEmailTemplate(
   <body>
     <div class="container">
       <div class="hero-header">
-        <span class="subtitle">Marwadi University • Tech Event</span>
-        <h1>MSC Annual Technology Symposium 2026</h1>
+        <span class="subtitle">Microsoft Student Community • Marwadi University</span>
+        <h1>Code To Cloud</h1>
       </div>
       <div class="content">
         ${bodyContent}
       </div>
       <div class="footer">
-        <p style="margin: 0 0 8px 0; font-weight: 600; color: #94a3b8;">Microsoft Student Chapter • Marwadi University</p>
-        <p style="margin: 0;">Automated Event & Attendance Verification System &copy; 2026</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600; color: #94a3b8;">Microsoft Student Community • Marwadi University</p>
+        <p style="margin: 0;">Code To Cloud — Hands-On Azure Workshop &copy; 2026</p>
       </div>
     </div>
   </body>
@@ -139,6 +162,8 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
     <span class="badge badge-warning">Action Required — Seat Allocated</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
     <p style="color: #cbd5e1;">A seat has been allocated for you at <strong>${data.eventName}</strong>! Please RSVP below to confirm your attendance before the deadline.</p>
+
+    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
@@ -190,6 +215,8 @@ export async function sendQueueEmail(data: {
       <p style="margin: 0; font-size: 12px; color: #64748b;">Updates automatically as seats open up</p>
     </div>
 
+    ${getEventPerksHTML()}
+
     <p style="color: #cbd5e1;">As students confirm or decline their allocations, seats open up automatically. You will receive an instant RSVP email as soon as a seat becomes available for you.</p>
     `
   );
@@ -218,6 +245,8 @@ export async function sendQueuePromotionEmail(data: {
     <span class="badge badge-success">Urgent — Seat Available!</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Great News ${data.studentName}!</h2>
     <p style="color: #cbd5e1;">A seat has just opened up for you at <strong>${data.eventName}</strong>!</p>
+
+    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
@@ -284,6 +313,8 @@ export async function sendFinalConfirmationWithQR(data: {
       <p style="font-size: 12px; color: #94a3b8; margin: 0;">Present this QR code or Unique ID at the auditorium entrance</p>
     </div>
 
+    ${getEventPerksHTML()}
+
     <div class="details-box">
       <div class="details-row"><span class="label">Student Name:</span><span class="val">${data.studentName}</span></div>
       <div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#38bdf8; font-weight:700;">${data.uniqueId}</span></div>
@@ -337,6 +368,8 @@ export async function sendRegistrationUpdatedEmail(data: {
     <span class="badge badge-warning">Record Updated</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
     <p style="color: #cbd5e1;">Your registration details for <strong>${data.eventName}</strong> have been updated by the event administrator.</p>
+
+    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Full Name:</span><span class="val">${data.studentName}</span></div>

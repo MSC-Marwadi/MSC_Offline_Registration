@@ -13,14 +13,41 @@ export async function getEventConfig() {
   if (!config) {
     config = await prisma.eventConfig.create({
       data: {
-        name: 'MSC Annual Tech Symposium 2026',
-        description: 'The flagship annual technology and innovation symposium featuring industry leaders, hands-on workshops, and tech showcases.',
+        name: 'Code To Cloud',
+        description: `Join the Microsoft Student Community at Marwadi University for a hands-on workshop where you’ll learn how to build and deploy your first website using Microsoft Azure.
+
+No prior cloud experience is required—just bring your curiosity and a charged laptop with VS Code installed.
+
+What you’ll get:
+💰 $100 Azure credit
+🌐 Build and deploy your own live website
+🏆 Prizes for top scorers
+📜 Certificate for everyone
+📢 Opportunity to be featured on official channels`,
         eventDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days in future
-        venue: 'Main University Auditorium & Online Stream',
+        venue: 'Main University Auditorium',
         totalCapacity: 100,
         confirmationWindowHours: 24,
         queueConfirmationWindowHours: 1,
         registrationOpen: true,
+      },
+    });
+  } else if (config.name !== 'Code To Cloud') {
+    // Automatically update existing config to Code To Cloud
+    config = await prisma.eventConfig.update({
+      where: { id: config.id },
+      data: {
+        name: 'Code To Cloud',
+        description: `Join the Microsoft Student Community at Marwadi University for a hands-on workshop where you’ll learn how to build and deploy your first website using Microsoft Azure.
+
+No prior cloud experience is required—just bring your curiosity and a charged laptop with VS Code installed.
+
+What you’ll get:
+💰 $100 Azure credit
+🌐 Build and deploy your own live website
+🏆 Prizes for top scorers
+📜 Certificate for everyone
+📢 Opportunity to be featured on official channels`,
       },
     });
   }

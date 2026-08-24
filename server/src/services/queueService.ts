@@ -28,6 +28,28 @@ export async function getEventConfig() {
 }
 
 /**
+ * Atomically re-indexes all QUEUED students by creation timestamp (1, 2, 3...)
+ * to guarantee zero duplicate queue positions and zero gaps.
+ */
+export async function reindexQueuePositions(tx: Prisma.TransactionClient): Promise<void> {
+  const queuedStudents = await tx.registration.findMany({
+    where: { status: RegistrationStatus.QUEUED },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  for (let i = 0; i < queuedStudents.length; i++) {
+    const student = queuedStudents[i];
+    const correctPos = i + 1;
+    if (student.queuePosition !== correctPos) {
+      await tx.registration.update({
+        where: { id: student.id },
+        data: { queuePosition: correctPos },
+      });
+    }
+  }
+}
+
+/**
  * Core registration handler inside a database transaction to prevent race conditions.
  */
 export async function registerStudentService(data: {
@@ -98,10 +120,6 @@ export async function registerStudentService(data: {
     } else {
       // Placed in queue
       newStatus = RegistrationStatus.QUEUED;
-      const currentQueueCount = await tx.registration.count({
-        where: { status: RegistrationStatus.QUEUED },
-      });
-      queuePosition = currentQueueCount + 1;
     }
 
     // 3. Create Registration Record
@@ -119,10 +137,16 @@ export async function registerStudentService(data: {
         semester: data.semester ? data.semester.trim() : 'N/A',
         division: data.division ? data.division.trim() : 'N/A',
         status: newStatus,
-        queuePosition: queuePosition,
+        queuePosition: null,
         confirmationDeadline: confirmationDeadline,
       },
     });
+
+    if (newStatus === RegistrationStatus.QUEUED) {
+      await reindexQueuePositions(tx);
+      const reindexed = await tx.registration.findUnique({ where: { id: createdReg.id } });
+      queuePosition = reindexed?.queuePosition || 1;
+    }
 
     const eventName = config?.name || 'MSC Tech Event';
 
@@ -268,25 +292,15 @@ export async function promoteNextInQueue(): Promise<any> {
       },
     });
 
-    // Shift queue positions of remaining queued students by -1
-    const remainingQueue = await tx.registration.findMany({
-      where: { status: RegistrationStatus.QUEUED },
-      orderBy: { queuePosition: 'asc' },
-    });
-
-    for (let i = 0; i < remainingQueue.length; i++) {
-      await tx.registration.update({
-        where: { id: remainingQueue[i].id },
-        data: { queuePosition: i + 1 },
-      });
-    }
+    // Re-index remaining queued students atomically
+    await reindexQueuePositions(tx);
 
     // Audit log
     await tx.auditLog.create({
       data: {
         action: 'QUEUE_PROMOTED_CONFIRMED',
         registrationId: updated.id,
-        metadata: JSON.stringify({ uniqueId, newQueueLength: remainingQueue.length }),
+        metadata: JSON.stringify({ uniqueId, action: 'PROMOTED_DIRECTLY' }),
       },
     });
 
@@ -573,10 +587,6 @@ export async function updateRegistrationWithStatusLogic(
           triggerQueuePromotion = true;
         }
       } else if (newStatus === RegistrationStatus.QUEUED) {
-        const currentQueuedCount = await tx.registration.count({
-          where: { status: RegistrationStatus.QUEUED },
-        });
-        queuePosition = currentQueuedCount + 1;
         uniqueId = null;
         qrCodeToken = null;
         confirmationDeadline = null;
@@ -584,14 +594,14 @@ export async function updateRegistrationWithStatusLogic(
         emailToEnqueue = {
           type: 'QUEUE_NOTICE',
           to: updateFields.email || existing.email,
-          subject: `Queue Status: #${queuePosition} for ${eventName}`,
+          subject: `Queue Status Notice for ${eventName}`,
           payload: {
             recipientEmail: updateFields.email || existing.email,
             studentName: updateFields.fullName || existing.fullName,
             eventName,
-            queuePosition,
+            queuePosition: 1,
           },
-          key: `status_queue_${id}`,
+          key: `status_queue_${id}_${Date.now()}`,
           regId: id,
         };
 
@@ -649,6 +659,17 @@ export async function updateRegistrationWithStatusLogic(
         ...(updateFields.additionalInfo !== undefined && { additionalInfo: updateFields.additionalInfo }),
       },
     });
+
+    // Always run atomic queue re-indexing to ensure 100% accurate 1,2,3... positions
+    await reindexQueuePositions(tx);
+
+    const reindexedStudent = await tx.registration.findUnique({ where: { id } });
+
+    if (newStatus === RegistrationStatus.QUEUED && reindexedStudent && emailToEnqueue && emailToEnqueue.type === 'QUEUE_NOTICE') {
+      const qPos = reindexedStudent.queuePosition || 1;
+      emailToEnqueue.payload.queuePosition = qPos;
+      emailToEnqueue.subject = `Queue Status: #${qPos} for ${eventName}`;
+    }
 
     await tx.auditLog.create({
       data: {

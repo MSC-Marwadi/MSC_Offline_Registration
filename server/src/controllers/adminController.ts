@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../prisma';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { RegistrationStatus, TokenResponseStatus } from '../types';
-import { promoteNextInQueue, getEventConfig, registerStudentService, updateRegistrationWithStatusLogic } from '../services/queueService';
+import { promoteNextInQueue, getEventConfig, registerStudentService, updateRegistrationWithStatusLogic, reindexQueuePositions } from '../services/queueService';
 import { enqueueEmail } from '../services/emailQueue';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-msc-event-key-change-in-production';
@@ -157,6 +157,11 @@ export async function getRegistrations(req: AuthenticatedRequest, res: Response)
     const limitNum = parseInt(limit as string, 10) || 50;
     const skip = (pageNum - 1) * limitNum;
 
+    // Run queue re-indexing to ensure 100% clean, non-duplicate 1,2,3 queue positions
+    await reindexQueuePositions(prisma as any).catch((err) =>
+      console.error('[ADMIN CONTROLLER] Reindex queue error:', err)
+    );
+
     const whereClause: any = {};
 
     if (status && typeof status === 'string' && status !== 'ALL') {
@@ -209,6 +214,10 @@ export async function getRegistrations(req: AuthenticatedRequest, res: Response)
  */
 export async function getQueueList(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
+    await reindexQueuePositions(prisma as any).catch((err) =>
+      console.error('[ADMIN CONTROLLER] Reindex queue error:', err)
+    );
+
     const queueList = await prisma.registration.findMany({
       where: { status: RegistrationStatus.QUEUED },
       orderBy: [{ queuePosition: 'asc' }, { createdAt: 'asc' }],

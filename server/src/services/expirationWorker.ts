@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import { RegistrationStatus, TokenResponseStatus } from '../types';
 import { prisma } from '../prisma';
 import { promoteNextInQueue } from './queueService';
-import { enqueueEmail } from './emailQueue';
+import { enqueueEmail, processEmailQueueAsync } from './emailQueue';
 
 let isExpirationWorkerRunning = false;
 
@@ -114,14 +114,18 @@ export async function runExpirationCheck() {
  * Initializes Cron schedule (runs every minute).
  */
 export function startExpirationCron() {
-  console.log('[EXPIRATION CRON] Scheduled expiration worker to run every minute.');
+  console.log('[EXPIRATION CRON] Scheduled expiration worker & email queue worker to run every minute.');
   // Run immediately on boot
   runExpirationCheck().catch((err) => console.error('[EXPIRATION WORKER] Boot run error:', err));
+  processEmailQueueAsync().catch((err) => console.error('[EMAIL QUEUE] Boot processing error:', err));
 
   // Cron schedule: every minute (* * * * *)
   cron.schedule('* * * * *', () => {
     runExpirationCheck().catch((err) =>
       console.error('[EXPIRATION CRON] Periodic execution error:', err)
+    );
+    processEmailQueueAsync().catch((err) =>
+      console.error('[EMAIL QUEUE CRON] Periodic queue processing error:', err)
     );
   });
 }

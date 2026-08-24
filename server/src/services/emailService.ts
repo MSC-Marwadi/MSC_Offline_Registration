@@ -14,16 +14,26 @@ function getTransporter() {
   const user = (process.env.GMAIL_USER || 'msc.marwadisupport@gmail.com').trim();
   const pass = (process.env.GMAIL_APP_PASSWORD || 'wnpviqzyhwnqftpt').trim();
   const host = (process.env.GMAIL_HOST || 'smtp.gmail.com').trim();
-  const port = parseInt(process.env.GMAIL_PORT || '587', 10);
+
+  // Render & cloud servers block outbound port 587 STARTTLS.
+  // Using service: 'gmail' (SSL/TLS port 465) bypasses cloud port blocks.
+  const transportOptions: any =
+    host === 'smtp.gmail.com'
+      ? {
+          service: 'gmail',
+          auth: { user, pass },
+          tls: { rejectUnauthorized: false },
+        }
+      : {
+          host,
+          port: parseInt(process.env.GMAIL_PORT || '465', 10),
+          secure: true,
+          auth: { user, pass },
+          tls: { rejectUnauthorized: false },
+        };
 
   return {
-    transporter: nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-      tls: { rejectUnauthorized: false },
-    }),
+    transporter: nodemailer.createTransport(transportOptions),
     user,
     pass,
     fromName: process.env.EMAIL_FROM_NAME || 'Department of Computer Engineering • MSC Team',

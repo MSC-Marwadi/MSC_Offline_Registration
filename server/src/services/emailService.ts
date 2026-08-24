@@ -317,6 +317,47 @@ export async function sendFinalConfirmationWithQR(data: {
 }
 
 /**
+ * Send Registration Details Updated Email
+ */
+export async function sendRegistrationUpdatedEmail(data: {
+  recipientEmail: string;
+  studentName: string;
+  eventName: string;
+  eventDate: string;
+  venue: string;
+  enrollmentNumber: string;
+  grNumber: string;
+  department: string;
+  status: string;
+  uniqueId?: string | null;
+}) {
+  const html = wrapEmailTemplate(
+    'Registration Details Updated',
+    `
+    <span class="badge badge-warning">Record Updated</span>
+    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #cbd5e1;">Your registration details for <strong>${data.eventName}</strong> have been updated by the event administrator.</p>
+
+    <div class="details-box">
+      <div class="details-row"><span class="label">Full Name:</span><span class="val">${data.studentName}</span></div>
+      <div class="details-row"><span class="label">Enrollment Number:</span><span class="val font-mono">${data.enrollmentNumber}</span></div>
+      <div class="details-row"><span class="label">GR Number:</span><span class="val font-mono">${data.grNumber}</span></div>
+      <div class="details-row"><span class="label">Department:</span><span class="val">${data.department}</span></div>
+      <div class="details-row"><span class="label">Status:</span><span class="val" style="color: #38bdf8; font-weight: 700;">${data.status}</span></div>
+      ${data.uniqueId ? `<div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#38bdf8; font-weight:700;">${data.uniqueId}</span></div>` : ''}
+      <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
+      <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
+      <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
+    </div>
+
+    <p style="font-size: 13px; color: #94a3b8; text-align: center;">If you have any questions regarding your registration update, please contact the Microsoft Student Chapter admin team.</p>
+    `
+  );
+
+  return sendEmail(data.recipientEmail, `[Updated] Registration Details for ${data.eventName}`, html);
+}
+
+/**
  * Send Cancellation / Seat Released Email
  */
 export async function sendCancellationNoticeEmail(data: {

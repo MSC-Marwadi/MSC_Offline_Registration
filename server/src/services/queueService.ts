@@ -659,6 +659,29 @@ export async function updateRegistrationWithStatusLogic(
       },
     });
 
+    // If status didn't change but details were updated, enqueue REGISTRATION_UPDATED email
+    if (!emailToEnqueue) {
+      emailToEnqueue = {
+        type: 'REGISTRATION_UPDATED',
+        to: updated.email,
+        subject: `[Updated] Registration Details for ${eventName}`,
+        payload: {
+          recipientEmail: updated.email,
+          studentName: updated.fullName,
+          eventName,
+          eventDate: eventDateStr,
+          venue: venueStr,
+          enrollmentNumber: updated.enrollmentNumber,
+          grNumber: updated.grNumber,
+          department: updated.department,
+          status: updated.status,
+          uniqueId: updated.uniqueId,
+        },
+        key: `update_${id}_${Date.now()}`,
+        regId: id,
+      };
+    }
+
     return updated;
   });
 

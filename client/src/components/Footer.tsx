@@ -36,11 +36,6 @@ export const Footer: React.FC = () => {
                   Registration Page
                 </Link>
               </li>
-              <li>
-                <Link to="/admin/login" className="hover:text-ms-blue transition-colors">
-                  Admin Login
-                </Link>
-              </li>
             </ul>
           </div>
 

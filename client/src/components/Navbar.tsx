@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, UserCheck, ShieldCheck, Ticket } from 'lucide-react';
+import { Calendar, Ticket } from 'lucide-react';
 
 interface NavbarProps {
   availableSeats?: number;
@@ -65,15 +65,6 @@ export const Navbar: React.FC<NavbarProps> = ({ availableSeats, totalCapacity })
                 </span>
               </div>
             )}
-
-            {/* Admin Portal Button */}
-            <Link
-              to="/admin/login"
-              className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold rounded bg-ms-gray-20 text-ms-gray-80 hover:bg-ms-blue hover:text-white transition-all shadow-sm border border-ms-gray-30"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 mr-1.5" />
-              <span>Admin</span>
-            </Link>
           </nav>
         </div>
       </div>

@@ -14,6 +14,10 @@ interface EmailJobPayload {
   uniqueId?: string;
   qrToken?: string;
   reason?: string;
+  enrollmentNumber?: string;
+  grNumber?: string;
+  department?: string;
+  status?: string;
 }
 
 /**
@@ -155,6 +159,21 @@ export async function processEmailQueueAsync() {
               recipientEmail: payload.recipientEmail,
               studentName: payload.studentName,
               eventName: payload.eventName,
+            });
+            break;
+
+          case 'REGISTRATION_UPDATED':
+            success = await emailService.sendRegistrationUpdatedEmail({
+              recipientEmail: payload.recipientEmail,
+              studentName: payload.studentName,
+              eventName: payload.eventName,
+              eventDate: payload.eventDate || 'TBD',
+              venue: payload.venue || 'Main Auditorium',
+              enrollmentNumber: payload.enrollmentNumber || 'N/A',
+              grNumber: payload.grNumber || 'N/A',
+              department: payload.department || 'N/A',
+              status: payload.status || 'Updated',
+              uniqueId: payload.uniqueId,
             });
             break;
 

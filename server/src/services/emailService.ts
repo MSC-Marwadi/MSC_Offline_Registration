@@ -15,22 +15,25 @@ function getTransporter() {
   const pass = (process.env.GMAIL_APP_PASSWORD || 'wnpviqzyhwnqftpt').trim();
   const host = (process.env.GMAIL_HOST || 'smtp.gmail.com').trim();
 
-  // Render & cloud servers block outbound port 587 STARTTLS.
-  // Using service: 'gmail' (SSL/TLS port 465) bypasses cloud port blocks.
-  const transportOptions: any =
-    host === 'smtp.gmail.com'
-      ? {
-          service: 'gmail',
-          auth: { user, pass },
-          tls: { rejectUnauthorized: false },
-        }
-      : {
-          host,
-          port: parseInt(process.env.GMAIL_PORT || '465', 10),
-          secure: true,
-          auth: { user, pass },
-          tls: { rejectUnauthorized: false },
-        };
+  // Render & cloud hosts block outbound port 587 STARTTLS.
+  // Force SSL port 465 for Gmail to guarantee email delivery regardless of env GMAIL_PORT setting.
+  const isGmail = host === 'smtp.gmail.com' || user.toLowerCase().endsWith('@gmail.com');
+
+  const transportOptions: any = isGmail
+    ? {
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false },
+      }
+    : {
+        host,
+        port: parseInt(process.env.GMAIL_PORT || '465', 10),
+        secure: true,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false },
+      };
 
   return {
     transporter: nodemailer.createTransport(transportOptions),

@@ -12,7 +12,10 @@ function getAppUrl(): string {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`.replace(/\/$/, '');
   }
-  return (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    return 'https://msc-offline-registration.vercel.app';
+  }
+  return 'http://localhost:5173';
 }
 
 // Dynamic Nodemailer Transport getter

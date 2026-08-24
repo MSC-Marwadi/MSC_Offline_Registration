@@ -453,7 +453,7 @@ export async function sendRegistrationNotAcceptedEmail(data: {
 }
 
 /**
- * Core SMTP Mail Sender with CID Attachments & Fallback Logging
+ * Core Mail Sender supporting HTTP REST APIs (Resend / Brevo) & Nodemailer SMTP Fallback
  */
 async function sendEmail(
   to: string,
@@ -461,7 +461,68 @@ async function sendEmail(
   htmlContent: string,
   attachments?: Array<{ filename: string; content: Buffer; cid?: string }>
 ): Promise<boolean> {
-  const { transporter, user, pass, fromName } = getTransporter();
+  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+  const brevoApiKey = (process.env.BREVO_API_KEY || '').trim();
+  const fromEmail = (process.env.GMAIL_USER || 'msc.marwadisupport@gmail.com').trim();
+  const fromName = process.env.EMAIL_FROM_NAME || 'Department of Computer Engineering • MSC Team';
+
+  // 1. HTTP API - Resend (Free 3,000 emails/month over HTTPS Port 443)
+  if (resendApiKey) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${resendApiKey}`,
+        },
+        body: JSON.stringify({
+          from: `${fromName} <onboarding@resend.dev>`,
+          to: [to],
+          subject,
+          html: htmlContent,
+        }),
+      });
+      const resData: any = await response.json();
+      if (response.ok) {
+        console.log(`[HTTP EMAIL SUCCESS - RESEND] Sent email to ${to}. Id: ${resData.id}`);
+        return true;
+      }
+      console.error(`[HTTP EMAIL ERROR - RESEND]`, resData);
+    } catch (err: any) {
+      console.error(`[HTTP EMAIL FETCH ERROR - RESEND]`, err);
+    }
+  }
+
+  // 2. HTTP API - Brevo / Sendinblue (Free 300 emails/day over HTTPS Port 443)
+  if (brevoApiKey) {
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': brevoApiKey,
+        },
+        body: JSON.stringify({
+          sender: { name: fromName, email: fromEmail },
+          to: [{ email: to }],
+          subject,
+          htmlContent,
+        }),
+      });
+      const resData: any = await response.json();
+      if (response.ok) {
+        console.log(`[HTTP EMAIL SUCCESS - BREVO] Sent email to ${to}. MessageId: ${resData.messageId}`);
+        return true;
+      }
+      console.error(`[HTTP EMAIL ERROR - BREVO]`, resData);
+    } catch (err: any) {
+      console.error(`[HTTP EMAIL FETCH ERROR - BREVO]`, err);
+    }
+  }
+
+  // 3. Nodemailer SMTP Fallback (for local development or paid instances)
+  const { transporter, user, pass } = getTransporter();
 
   if (!user || user === 'your_email@gmail.com' || !pass) {
     console.log(`\n======================================================`);

@@ -24,22 +24,22 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Helper component rendering event perks for Code To Cloud
+ * Helper component rendering event perks for Code To Cloud (Light Fluent Theme)
  */
 function getEventPerksHTML(): string {
   return `
-  <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1px solid #3b82f6; border-radius: 12px; padding: 20px; margin: 24px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-    <div style="margin-bottom: 12px;">
-      <span style="font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px;">🎁 Department of Computer Engineering Presents Code To Cloud</span>
+  <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 18px; margin: 20px 0;">
+    <div style="margin-bottom: 10px;">
+      <span style="font-size: 13px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.8px;">🎁 Department of Computer Engineering Presents Code To Cloud</span>
     </div>
-    <div style="font-size: 14px; color: #e2e8f0; line-height: 1.8;">
-      <div style="margin-bottom: 6px;">💰 <strong style="color: #4ade80;">$100 Azure Credit</strong> — Free cloud credit for hands-on deployment</div>
-      <div style="margin-bottom: 6px;">🌐 <strong style="color: #60a5fa;">Build & Deploy Live Site</strong> — Build & deploy your own website on Microsoft Azure</div>
-      <div style="margin-bottom: 6px;">🏆 <strong style="color: #facc15;">Prizes & Awards</strong> — Top scorers win exclusive prizes & swag</div>
-      <div style="margin-bottom: 6px;">📜 <strong style="color: #c084fc;">Official Certificate</strong> — Certificate for all participants</div>
-      <div>📢 <strong style="color: #f472b6;">Official Spotlight</strong> — Opportunity to be featured on official MSC channels</div>
+    <div style="font-size: 14px; color: #0f172a; line-height: 1.8;">
+      <div style="margin-bottom: 6px;">💰 <strong style="color: #15803d;">$100 Azure Credit</strong> — Free cloud credit for hands-on deployment</div>
+      <div style="margin-bottom: 6px;">🌐 <strong style="color: #0369a1;">Build & Deploy Live Site</strong> — Build & deploy your own website on Microsoft Azure</div>
+      <div style="margin-bottom: 6px;">🏆 <strong style="color: #b45309;">Prizes & Awards</strong> — Top scorers win exclusive prizes & swag</div>
+      <div style="margin-bottom: 6px;">📜 <strong style="color: #6b21a8;">Official Certificate</strong> — Certificate for all participants</div>
+      <div>📢 <strong style="color: #be185d;">Official Spotlight</strong> — Opportunity to be featured on official MSC channels</div>
     </div>
-    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #334155; font-size: 12px; color: #94a3b8; font-style: italic;">
+    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #e0f2fe; font-size: 12px; color: #475569; font-style: italic;">
       💻 <strong>Prerequisites:</strong> No prior cloud experience required! Just bring your curiosity and a charged laptop with VS Code installed.
     </div>
   </div>
@@ -99,40 +99,47 @@ function wrapEmailTemplate(
     <title>${title}</title>
     ${jsonLdSchema}
     <style>
-      body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 20px; color: #e2e8f0; }
-      .container { max-width: 620px; margin: 0 auto; background-color: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5); border: 1px solid #334155; }
-      .hero-header { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0078D4 100%); padding: 32px 28px; text-align: left; border-bottom: 2px solid #00e5ff; }
-      .hero-header h1 { margin: 0; font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.3; }
-      .hero-header .subtitle { font-size: 13px; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
-      .content { padding: 32px 28px; line-height: 1.6; color: #f1f5f9; }
-      .badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); margin-bottom: 20px; }
-      .badge-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
-      .badge-warning { background: rgba(234, 179, 8, 0.15); color: #fde047; border-color: rgba(234, 179, 8, 0.3); }
-      .badge-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
-      .btn-container { text-align: center; margin: 32px 0; }
-      .btn { display: inline-block; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 700; text-decoration: none; margin: 6px 8px; transition: all 0.2s ease; letter-spacing: 0.5px; }
-      .btn-yes { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); border: 1px solid #22c55e; }
-      .btn-no { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff !important; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); border: 1px solid #ef4444; }
-      .details-box { background-color: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin: 24px 0; }
-      .details-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b; font-size: 14px; }
+      body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 24px; color: #1e293b; }
+      .container { max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+      .hero-header { background: #ffffff; padding: 28px 28px 24px 28px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+      .hero-header h1 { margin: 0; font-size: 24px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; line-height: 1.3; }
+      .hero-header .subtitle { font-size: 12px; color: #0078D4; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; display: block; }
+      .content { padding: 28px; line-height: 1.6; color: #334155; }
+      .badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #eff6ff; color: #0078D4; border: 1px solid #bfdbfe; margin-bottom: 18px; }
+      .badge-success { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+      .badge-warning { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+      .badge-danger { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+      .btn-container { text-align: center; margin: 28px 0; }
+      .btn { display: inline-block; padding: 13px 30px; border-radius: 6px; font-size: 14px; font-weight: 700; text-decoration: none; margin: 6px 8px; transition: all 0.2s ease; letter-spacing: 0.3px; }
+      .btn-yes { background: #0078D4; color: #ffffff !important; box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3); }
+      .btn-no { background: #ffffff; color: #dc2626 !important; border: 1px solid #fca5a5; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1); }
+      .details-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0; }
+      .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
       .details-row:last-child { border-bottom: none; }
-      .label { font-weight: 600; color: #94a3b8; }
-      .val { color: #f8fafc; font-weight: 600; text-align: right; }
-      .footer { background-color: #0f172a; padding: 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #334155; }
-      .qr-card { background: #0f172a; border: 2px solid #0078D4; border-radius: 16px; padding: 24px; text-align: center; margin: 24px 0; }
+      .label { font-weight: 600; color: #64748b; }
+      .val { color: #0f172a; font-weight: 600; text-align: right; }
+      .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+      .qr-card { background: #f8fafc; border: 2px solid #0078D4; border-radius: 16px; padding: 24px; text-align: center; margin: 20px 0; }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="hero-header">
+        <!-- Microsoft 4-tile branding accent line -->
+        <div style="margin-bottom: 12px; font-size: 0;">
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #F25022; margin-right: 2px;"></span>
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #7FBA00; margin-right: 2px;"></span>
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #0078D4; margin-right: 2px;"></span>
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #FFB900;"></span>
+        </div>
         <span class="subtitle">Department of Computer Engineering • Microsoft Student Community</span>
-        <h1>Code To Cloud</h1>
+        <h1>Code to Cloud: Build & Deploy Your First Website on Azure</h1>
       </div>
       <div class="content">
         ${bodyContent}
       </div>
       <div class="footer">
-        <p style="margin: 0 0 8px 0; font-weight: 600; color: #94a3b8;">Department of Computer Engineering • Microsoft Student Community</p>
+        <p style="margin: 0 0 6px 0; font-weight: 700; color: #334155;">Department of Computer Engineering • Microsoft Student Community</p>
         <p style="margin: 0; color: #64748b;">Marwadi University, Rajkot • Code To Cloud Workshop &copy; 2026</p>
       </div>
     </div>
@@ -160,17 +167,17 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
     'Action Required: Confirm Your Event RSVP',
     `
     <span class="badge badge-warning">Action Required — Seat Allocated</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #cbd5e1;">A seat has been allocated for you at <strong>${data.eventName}</strong>! Please RSVP below to confirm your attendance before the deadline.</p>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">A seat has been allocated for you at <strong>${data.eventName}</strong>! Please RSVP below to confirm your attendance before the deadline.</p>
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
-      <div class="details-row"><span class="label">RSVP Deadline:</span><span class="val" style="color: #ef4444; font-weight:700;">${data.deadlineFormatted}</span></div>
+      <div class="details-row"><span class="label">RSVP Deadline:</span><span class="val" style="color: #dc2626; font-weight:700;">${data.deadlineFormatted}</span></div>
     </div>
 
-    <p style="color: #cbd5e1;">Click <strong>YES</strong> to claim your seat and generate your official QR Code ticket pass. If you cannot make it, please click <strong>NO</strong> so your seat can be released to students in the queue.</p>
+    <p style="color: #334155;">Click <strong>YES</strong> to claim your seat and generate your official QR Code ticket pass. If you cannot make it, please click <strong>NO</strong> so your seat can be released to students in the queue.</p>
 
     <div class="btn-container">
       <a href="${yesLink}" class="btn btn-yes">YES — I WILL ATTEND</a>
@@ -204,16 +211,16 @@ export async function sendQueueEmail(data: {
     'Registration Queue Status',
     `
     <span class="badge badge-warning">Queue Status</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #cbd5e1;">Thank you for registering for <strong>${data.eventName}</strong>. Maximum initial seat capacity has been reached, so your registration is queued.</p>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">Thank you for registering for <strong>${data.eventName}</strong>. Maximum initial seat capacity has been reached, so your registration is queued.</p>
 
-    <div class="details-box" style="text-align: center; padding: 24px;">
-      <p style="margin: 0; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Your Queue Position</p>
-      <h1 style="font-size: 52px; margin: 8px 0; color: #38bdf8; font-weight: 800;">#${data.queuePosition}</h1>
+    <div class="details-box" style="text-align: center; padding: 24px; background: #eff6ff; border-color: #bfdbfe;">
+      <p style="margin: 0; font-size: 12px; color: #0369a1; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Your Queue Position</p>
+      <h1 style="font-size: 52px; margin: 8px 0; color: #0078D4; font-weight: 800;">#${data.queuePosition}</h1>
       <p style="margin: 0; font-size: 12px; color: #64748b;">Updates automatically as seats open up</p>
     </div>
 
-    <p style="color: #cbd5e1;">As students confirm or decline their allocations, seats open up automatically. You will receive an instant RSVP email as soon as a seat becomes available for you.</p>
+    <p style="color: #334155;">As students confirm or decline their allocations, seats open up automatically. You will receive an instant RSVP email as soon as a seat becomes available for you.</p>
     `
   );
 
@@ -239,17 +246,17 @@ export async function sendQueuePromotionEmail(data: {
     'Seat Available: Queue Promotion!',
     `
     <span class="badge badge-success">Urgent — Seat Available!</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Great News ${data.studentName}!</h2>
-    <p style="color: #cbd5e1;">A seat has just opened up for you at <strong>${data.eventName}</strong>!</p>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Great News ${data.studentName}!</h2>
+    <p style="color: #334155;">A seat has just opened up for you at <strong>${data.eventName}</strong>!</p>
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
-      <div class="details-row"><span class="label">Urgent RSVP Deadline:</span><span class="val" style="color: #ef4444; font-weight: 700;">${data.deadlineFormatted}</span></div>
+      <div class="details-row"><span class="label">Urgent RSVP Deadline:</span><span class="val" style="color: #dc2626; font-weight: 700;">${data.deadlineFormatted}</span></div>
     </div>
 
-    <p style="color: #cbd5e1;">You have a limited window to claim this seat. Please RSVP below immediately:</p>
+    <p style="color: #334155;">You have a limited window to claim this seat. Please RSVP below immediately:</p>
 
     <div class="btn-container">
       <a href="${yesLink}" class="btn btn-yes">YES — I WILL ATTEND</a>
@@ -298,26 +305,26 @@ export async function sendFinalConfirmationWithQR(data: {
     'Registration Confirmed — Entry Ticket Pass',
     `
     <span class="badge badge-success">Official Entry Pass</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Congratulations ${data.studentName}!</h2>
-    <p style="color: #cbd5e1;">Your attendance at <strong>${data.eventName}</strong> is officially confirmed. Below is your official ticket pass with your Unique Ticket ID and Entrance QR Code.</p>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Congratulations ${data.studentName}!</h2>
+    <p style="color: #334155;">Your attendance at <strong>${data.eventName}</strong> is officially confirmed. Below is your official ticket pass with your Unique Ticket ID and Entrance QR Code.</p>
 
     <div class="qr-card">
-      <img src="cid:ticketqrcode" alt="Event Ticket QR Code" style="width: 220px; height: 220px; display: block; margin: 0 auto; border-radius: 12px; background: #ffffff; padding: 12px;" />
-      <p style="font-weight: 800; font-size: 24px; letter-spacing: 2px; color: #38bdf8; margin: 16px 0 4px 0;">${data.uniqueId}</p>
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">Present this QR code or Unique ID at the auditorium entrance</p>
+      <img src="cid:ticketqrcode" alt="Event Ticket QR Code" style="width: 220px; height: 220px; display: block; margin: 0 auto; border-radius: 12px; background: #ffffff; padding: 12px; border: 1px solid #e2e8f0;" />
+      <p style="font-weight: 800; font-size: 24px; letter-spacing: 2px; color: #0078D4; margin: 16px 0 4px 0;">${data.uniqueId}</p>
+      <p style="font-size: 12px; color: #64748b; margin: 0;">Present this QR code or Unique ID at the auditorium entrance</p>
     </div>
 
     ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Student Name:</span><span class="val">${data.studentName}</span></div>
-      <div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#38bdf8; font-weight:700;">${data.uniqueId}</span></div>
+      <div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#0078D4; font-weight:700;">${data.uniqueId}</span></div>
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
     </div>
 
-    <p style="font-size: 13px; color: #94a3b8; text-align: center;">Please arrive 15 minutes prior to start time. Keep this email saved on your phone for scanner check-in.</p>
+    <p style="font-size: 13px; color: #64748b; text-align: center;">Please arrive 15 minutes prior to start time. Keep this email saved on your phone for scanner check-in.</p>
     `,
     {
       eventName: data.eventName,
@@ -360,22 +367,22 @@ export async function sendRegistrationUpdatedEmail(data: {
     'Registration Details Updated',
     `
     <span class="badge badge-warning">Record Updated</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #cbd5e1;">Your registration details for <strong>${data.eventName}</strong> have been updated by the event administrator.</p>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">Your registration details for <strong>${data.eventName}</strong> have been updated by the event administrator.</p>
 
     <div class="details-box">
       <div class="details-row"><span class="label">Full Name:</span><span class="val">${data.studentName}</span></div>
       <div class="details-row"><span class="label">Enrollment Number:</span><span class="val font-mono">${data.enrollmentNumber}</span></div>
       <div class="details-row"><span class="label">GR Number:</span><span class="val font-mono">${data.grNumber}</span></div>
       <div class="details-row"><span class="label">Department:</span><span class="val">${data.department}</span></div>
-      <div class="details-row"><span class="label">Status:</span><span class="val" style="color: #38bdf8; font-weight: 700;">${data.status}</span></div>
-      ${data.uniqueId ? `<div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#38bdf8; font-weight:700;">${data.uniqueId}</span></div>` : ''}
+      <div class="details-row"><span class="label">Status:</span><span class="val" style="color: #0078D4; font-weight: 700;">${data.status}</span></div>
+      ${data.uniqueId ? `<div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#0078D4; font-weight:700;">${data.uniqueId}</span></div>` : ''}
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
     </div>
 
-    <p style="font-size: 13px; color: #94a3b8; text-align: center;">If you have any questions regarding your registration update, please contact the Microsoft Student Chapter admin team.</p>
+    <p style="font-size: 13px; color: #64748b; text-align: center;">If you have any questions regarding your registration update, please contact the Microsoft Student Chapter admin team.</p>
     `
   );
 

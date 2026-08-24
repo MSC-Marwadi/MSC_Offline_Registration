@@ -9,15 +9,11 @@ import { enqueueEmail } from './emailQueue';
  * Gets or initializes default event configuration
  */
 export async function getEventConfig() {
-  const targetTitle = 'Code to Cloud: Build & Deploy Your First Website on Azure';
-  const targetVenue = 'MC501A';
-  const targetDate = new Date('2026-08-26T10:00:00+05:30'); // Aug 26, 2026 10:00 AM IST
-
   let config = await prisma.eventConfig.findFirst();
   if (!config) {
     config = await prisma.eventConfig.create({
       data: {
-        name: targetTitle,
+        name: 'Code to Cloud: Build & Deploy Your First Website on Azure',
         description: `Join the Microsoft Student Community at Marwadi University for a hands-on workshop where you’ll learn how to build and deploy your first website using Microsoft Azure.
 
 No prior cloud experience is required—just bring your curiosity and a charged laptop with VS Code installed.
@@ -28,33 +24,12 @@ What you’ll get:
 🏆 Prizes for top scorers
 📜 Certificate for everyone
 📢 Opportunity to be featured on official channels`,
-        eventDate: targetDate,
-        venue: targetVenue,
+        eventDate: new Date('2026-08-26T10:00:00+05:30'),
+        venue: 'MC501A',
         totalCapacity: 100,
         confirmationWindowHours: 24,
         queueConfirmationWindowHours: 1,
         registrationOpen: true,
-      },
-    });
-  } else {
-    // Automatically keep existing config in sync with exact event title, date, and venue
-    config = await prisma.eventConfig.update({
-      where: { id: config.id },
-      data: {
-        name: targetTitle,
-        venue: targetVenue,
-        eventDate: targetDate,
-        totalCapacity: 100,
-        description: `Join the Microsoft Student Community at Marwadi University for a hands-on workshop where you’ll learn how to build and deploy your first website using Microsoft Azure.
-
-No prior cloud experience is required—just bring your curiosity and a charged laptop with VS Code installed.
-
-What you’ll get:
-💰 $100 Azure credit
-🌐 Build and deploy your own live website
-🏆 Prizes for top scorers
-📜 Certificate for everyone
-📢 Opportunity to be featured on official channels`,
       },
     });
   }
@@ -124,6 +99,11 @@ export async function registerStudentService(data: {
     }
 
     const config = await tx.eventConfig.findFirst();
+
+    if (config && config.registrationOpen === false) {
+      throw new Error('Public registration for this event is currently closed by the event organizers.');
+    }
+
     const capacity = config ? config.totalCapacity : 100;
     const initialHours = config ? config.confirmationWindowHours : 24;
 

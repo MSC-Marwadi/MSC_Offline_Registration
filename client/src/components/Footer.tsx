@@ -63,7 +63,7 @@ export const Footer: React.FC = () => {
 
         <div className="mt-8 pt-6 border-t border-ms-gray-30 flex flex-col sm:flex-row justify-between items-center text-xs text-ms-gray-60">
           <p>&copy; {new Date().getFullYear()} Microsoft Student Chapter. All rights reserved.</p>
-          <p className="mt-2 sm:mt-0">Built with React, Express, Prisma & PostgreSQL</p>
+
         </div>
       </div>
     </footer>

@@ -11,6 +11,7 @@
     "build:server": "cd server && npm run build",
     "build": "npm run build:client && npm run build:server",
     "render-build": "cd client && npm install --include=dev && npm run build && cd ../server && npm install --include=dev && npx prisma generate && npm run build && npx prisma db push --accept-data-loss",
+    "vercel-build": "cd server && npm install --include=dev && npx prisma generate && cd ../client && npm install --include=dev && npm run build",
     "start": "cd server && node dist/index.js",
     "prisma:generate": "cd server && npx prisma generate",
     "prisma:migrate": "cd server && npx prisma migrate dev",

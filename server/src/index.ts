@@ -70,18 +70,21 @@ async function startServer() {
     // Start expiration cron background task
     startExpirationCron();
 
-    app.listen(PORT, () => {
-      console.log(`\n======================================================`);
-      console.log(`🚀 MSC Event Registration & Attendance Server Running!`);
-      console.log(`Port: ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`URL: http://localhost:${PORT}`);
-      console.log(`======================================================\n`);
-    });
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`\n======================================================`);
+        console.log(`🚀 MSC Event Registration & Attendance Server Running!`);
+        console.log(`Port: ${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`URL: http://localhost:${PORT}`);
+        console.log(`======================================================\n`);
+      });
+    }
   } catch (error) {
     console.error('[SERVER BOOT ERROR] Failed to start server:', error);
-    process.exit(1);
   }
 }
 
 startServer();
+
+export default app;

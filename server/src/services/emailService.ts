@@ -45,7 +45,7 @@ function getTransporter() {
     transporter: nodemailer.createTransport(transportOptions),
     user,
     pass,
-    fromName: process.env.EMAIL_FROM_NAME || 'Department of Computer Engineering • MSC Team',
+    fromName: process.env.EMAIL_FROM_NAME || 'Microsoft Student Community • Marwadi University',
   };
 }
 
@@ -56,7 +56,7 @@ function getEventPerksHTML(): string {
   return `
   <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 18px; margin: 20px 0;">
     <div style="margin-bottom: 10px;">
-      <span style="font-size: 13px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.8px;">🎁 Department of Computer Engineering Presents Code To Cloud</span>
+      <span style="font-size: 13px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.8px;">🎁 Microsoft Student Community • Marwadi University</span>
     </div>
     <div style="font-size: 14px; color: #0f172a; line-height: 1.8;">
       <div style="margin-bottom: 6px;">💰 <strong style="color: #15803d;">$100 Azure Credit</strong> — Free cloud credit for hands-on deployment</div>
@@ -158,14 +158,14 @@ function wrapEmailTemplate(
           <span style="display: inline-block; width: 12px; height: 12px; background-color: #0078D4; margin-right: 2px;"></span>
           <span style="display: inline-block; width: 12px; height: 12px; background-color: #FFB900;"></span>
         </div>
-        <span class="subtitle">Department of Computer Engineering • Microsoft Student Community</span>
+        <span class="subtitle">Microsoft Student Community • Marwadi University</span>
         <h1>Code to Cloud: Build & Deploy Your First Website on Azure</h1>
       </div>
       <div class="content">
         ${bodyContent}
       </div>
       <div class="footer">
-        <p style="margin: 0 0 6px 0; font-weight: 700; color: #334155;">Department of Computer Engineering • Microsoft Student Community</p>
+        <p style="margin: 0 0 6px 0; font-weight: 700; color: #334155;">Microsoft Student Community • Marwadi University</p>
         <p style="margin: 0; color: #64748b;">Marwadi University, Rajkot • Code To Cloud Workshop &copy; 2026</p>
       </div>
     </div>
@@ -470,7 +470,7 @@ async function sendEmail(
   const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
   const brevoApiKey = (process.env.BREVO_API_KEY || '').trim();
   const fromEmail = (process.env.GMAIL_USER || 'msc.marwadisupport@gmail.com').trim();
-  const fromName = process.env.EMAIL_FROM_NAME || 'Department of Computer Engineering • MSC Team';
+  const fromName = process.env.EMAIL_FROM_NAME || 'Microsoft Student Community • Marwadi University';
 
   // 1. HTTP API - Resend (Free 3,000 emails/month over HTTPS Port 443)
   if (resendApiKey) {

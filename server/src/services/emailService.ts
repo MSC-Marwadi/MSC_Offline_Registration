@@ -28,6 +28,9 @@ function getTransporter() {
   // Force SSL port 465 for Gmail to guarantee email delivery regardless of env GMAIL_PORT setting.
   const isGmail = host === 'smtp.gmail.com' || user.toLowerCase().endsWith('@gmail.com');
 
+  const port = parseInt(process.env.GMAIL_PORT || '465', 10);
+  const secure = port === 465;
+
   const transportOptions: any = isGmail
     ? {
         host: 'smtp.gmail.com',
@@ -38,8 +41,8 @@ function getTransporter() {
       }
     : {
         host,
-        port: parseInt(process.env.GMAIL_PORT || '465', 10),
-        secure: true,
+        port,
+        secure,
         auth: { user, pass },
         tls: { rejectUnauthorized: false },
       };

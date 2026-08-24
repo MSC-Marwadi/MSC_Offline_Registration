@@ -27,7 +27,7 @@ What you’ll get:
         eventDate: new Date('2026-08-26T10:00:00+05:30'),
         venue: 'MC501A',
         totalCapacity: 100,
-        confirmationWindowHours: 24,
+        confirmationWindowHours: 1,
         queueConfirmationWindowHours: 1,
         registrationOpen: true,
       },
@@ -105,7 +105,7 @@ export async function registerStudentService(data: {
     }
 
     const capacity = config ? config.totalCapacity : 100;
-    const initialHours = config ? config.confirmationWindowHours : 24;
+    const initialHours = config ? config.confirmationWindowHours : 1;
 
     // 2. Count currently occupied/allocated seats
     const occupiedSeatsCount = await tx.registration.count({
@@ -289,20 +289,25 @@ export async function promoteNextInQueue(): Promise<any> {
     }
 
     const deadline = new Date(Date.now() + queueHours * 60 * 60 * 1000);
+    const tokenString = crypto.randomBytes(32).toString('hex');
 
-    // Generate Unique ID & QR Token for Direct Confirmation
-    const uniqueId = await generateNextUniqueId(tx);
-    const qrCodeToken = `QR-${uniqueId}-${crypto.randomBytes(16).toString('hex')}`;
-
-    // Update promoted registration directly to CONFIRMED
+    // Update promoted registration to PROMOTED status (pending confirmation)
     const updated = await tx.registration.update({
       where: { id: nextQueued.id },
       data: {
-        status: RegistrationStatus.CONFIRMED,
-        uniqueId: uniqueId,
-        qrCodeToken: qrCodeToken,
+        status: RegistrationStatus.PROMOTED,
         queuePosition: null,
-        confirmationDeadline: null,
+        confirmationDeadline: deadline,
+      },
+    });
+
+    // Create Confirmation Token
+    await tx.confirmationToken.create({
+      data: {
+        registrationId: updated.id,
+        token: tokenString,
+        expiresAt: deadline,
+        responseStatus: TokenResponseStatus.PENDING,
       },
     });
 
@@ -312,30 +317,31 @@ export async function promoteNextInQueue(): Promise<any> {
     // Audit log
     await tx.auditLog.create({
       data: {
-        action: 'QUEUE_PROMOTED_CONFIRMED',
+        action: 'QUEUE_PROMOTED_PENDING',
         registrationId: updated.id,
-        metadata: JSON.stringify({ uniqueId, action: 'PROMOTED_DIRECTLY' }),
+        metadata: JSON.stringify({ deadline }),
       },
     });
 
     const eventName = config?.name || 'MSC Tech Event';
     const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
     const venueStr = config?.venue || 'Main Auditorium';
+    const deadlineStr = deadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
     emailToEnqueue = {
-      type: 'FINAL_CONFIRMATION',
+      type: 'QUEUE_PROMOTION',
       to: updated.email,
-      subject: `Confirmed Ticket [${uniqueId}] for ${eventName}`,
+      subject: `Confirm your seat within 1 hour`,
       payload: {
         recipientEmail: updated.email,
         studentName: updated.fullName,
         eventName,
         eventDate: eventDateStr,
         venue: venueStr,
-        uniqueId,
-        qrToken: qrCodeToken,
+        token: tokenString,
+        deadlineFormatted: deadlineStr,
       },
-      key: `promo_final_${updated.id}_${uniqueId}`,
+      key: `promo_pending_${updated.id}_${tokenString}`,
       regId: updated.id,
     };
 
@@ -623,7 +629,7 @@ export async function updateRegistrationWithStatusLogic(
           triggerQueuePromotion = true;
         }
       } else if (newStatus === RegistrationStatus.CONFIRMATION_PENDING || newStatus === RegistrationStatus.PROMOTED) {
-        const windowHours = config ? config.confirmationWindowHours : 24;
+        const windowHours = config ? config.confirmationWindowHours : 1;
         confirmationDeadline = new Date(Date.now() + windowHours * 60 * 60 * 1000);
         const tokenString = crypto.randomBytes(32).toString('hex');
 

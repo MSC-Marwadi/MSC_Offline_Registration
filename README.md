@@ -1,6 +1,6 @@
 # 🚀 MSC Event Registration & Entrance Attendance System
 
-An enterprise-grade, high-concurrency event registration, FIFO queue management, and QR code ticket scanning system built for the **Microsoft Student Chapter (MSC) at Marwadi University**.
+An enterprise-grade, high-concurrency event registration, FIFO queue management, and QR code ticket scanning system built for the **Microsoft Student Community (MSC) at Marwadi University**.
 
 ![MSC Tech Symposium 2026](https://img.shields.io/badge/MSC-Event%20System-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -82,4 +82,4 @@ Environment files (`.env`) containing sensitive credentials, database passwords,
 ---
 
 ## 📄 License
-Licensed under the MIT License. Developed for **Microsoft Student Chapter - Marwadi University**.
+Licensed under the MIT License. Developed for **Microsoft Student Community - Marwadi University**.

@@ -14,7 +14,7 @@ export const Footer: React.FC = () => {
                 <div className="bg-[#0078D4] w-2 h-2"></div>
                 <div className="bg-[#FFB900] w-2 h-2"></div>
               </div>
-              <span className="font-semibold text-ms-gray-90">Microsoft Student Chapter</span>
+              <span className="font-semibold text-ms-gray-90">Microsoft Student Community</span>
             </div>
             <p className="text-xs leading-relaxed text-ms-gray-60">
               Empowering students through technology, innovation, leadership, and community learning.
@@ -55,14 +55,14 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <span className="text-ms-gray-60">Email: support@msc.edu</span>
+                <span className="text-ms-gray-60">Email: <a href="mailto:msc.marwadisupport@gmail.com" className="hover:text-ms-blue transition-colors">msc.marwadisupport@gmail.com</a></span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 pt-6 border-t border-ms-gray-30 flex flex-col sm:flex-row justify-between items-center text-xs text-ms-gray-60">
-          <p>&copy; {new Date().getFullYear()} Microsoft Student Chapter. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Microsoft Student Community. All rights reserved.</p>
 
         </div>
       </div>

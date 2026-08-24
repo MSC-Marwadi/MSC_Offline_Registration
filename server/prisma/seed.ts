@@ -17,7 +17,7 @@ async function main() {
       eventDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
       venue: 'Main University Auditorium & Online Stream',
       totalCapacity: 100,
-      confirmationWindowHours: 24,
+      confirmationWindowHours: 1,
       queueConfirmationWindowHours: 1,
       registrationOpen: true,
     },

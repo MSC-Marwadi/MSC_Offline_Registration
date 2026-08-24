@@ -25,7 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({ availableSeats, totalCapacity })
             </div>
             <div>
               <span className="font-semibold text-lg text-ms-gray-90 tracking-tight">
-                Microsoft Student Chapter
+                Microsoft Student Community
               </span>
               <span className="hidden sm:inline-block ml-2 text-xs font-medium px-2 py-0.5 bg-ms-blue-subtle text-ms-blue rounded">
                 Event Portal

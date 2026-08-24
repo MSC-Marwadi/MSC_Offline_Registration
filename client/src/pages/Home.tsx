@@ -4,7 +4,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import api from '../services/api';
 import { EventConfig } from '../types';
-import { Calendar, MapPin, Users, Clock, CheckCircle2, ChevronRight, HelpCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2, HelpCircle, AlertCircle, ArrowRight } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const [eventData, setEventData] = useState<EventConfig | null>(null);
@@ -61,138 +61,59 @@ export const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-white via-ms-blue-subtle/30 to-ms-gray-10 border-b border-ms-gray-30 py-16 lg:py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center space-x-2 bg-ms-blue-subtle text-ms-blue border border-ms-blue/20 px-3.5 py-1.5 rounded-full text-xs font-semibold">
-                <span className="w-2 h-2 rounded-full bg-ms-blue animate-pulse"></span>
-                <span>Official Microsoft Student Chapter Event</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-ms-gray-90 tracking-tight leading-tight">
-                {loading ? 'Loading Event Info...' : eventData?.name || 'MSC Annual Tech Symposium 2026'}
-              </h1>
-
-              <p className="text-base sm:text-lg text-ms-gray-70 leading-relaxed whitespace-pre-line">
-                {eventData?.description ||
-                  'Join top student innovators, cloud architects, and tech leaders for hands-on workshops, keynotes, and project showcases.'}
-              </p>
-
-              {/* Event Metadata Badges */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="flex items-start space-x-3 p-3.5 bg-white rounded-lg border border-ms-gray-30 shadow-fluent">
-                  <Calendar className="w-5 h-5 text-ms-blue mt-0.5" />
-                  <div>
-                    <span className="text-xs font-semibold text-ms-gray-60 uppercase block">Date & Time</span>
-                    <span className="text-sm font-medium text-ms-gray-90">
-                      {eventData?.eventDate ? new Date(eventData.eventDate).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' }) : 'Date TBD'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 p-3.5 bg-white rounded-lg border border-ms-gray-30 shadow-fluent">
-                  <MapPin className="w-5 h-5 text-ms-red mt-0.5" />
-                  <div>
-                    <span className="text-xs font-semibold text-ms-gray-60 uppercase block">Venue</span>
-                    <span className="text-sm font-medium text-ms-gray-90">{eventData?.venue || 'Main Auditorium'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold rounded bg-ms-blue text-white hover:bg-ms-blue-dark transition-all shadow-fluent-depth-8 hover:shadow-fluent-depth-16"
-                >
-                  <span>Register Now</span>
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-
-                <a
-                  href="#check-status"
-                  className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold rounded bg-white text-ms-gray-80 border border-ms-gray-40 hover:bg-ms-gray-20 transition-all shadow-sm"
-                >
-                  <span>Check Status</span>
-                </a>
-              </div>
+          <div className="max-w-3xl space-y-6">
+            <div className="inline-flex items-center space-x-2 bg-ms-blue-subtle text-ms-blue border border-ms-blue/20 px-3.5 py-1.5 rounded-full text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-ms-blue animate-pulse"></span>
+              <span>Official Microsoft Student Community Event</span>
             </div>
 
-            {/* Right Side Capacity Card */}
-            <div className="lg:col-span-5">
-              <div className="bg-white rounded-xl border border-ms-gray-30 p-6 sm:p-8 shadow-fluent-depth-16">
-                <div className="flex items-center justify-between border-b border-ms-gray-30 pb-4 mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-ms-blue" />
-                    <h3 className="font-semibold text-ms-gray-90 text-lg">Live Seat Status</h3>
-                  </div>
-                  <span className="text-xs font-mono bg-ms-gray-20 text-ms-gray-70 px-2.5 py-1 rounded">
-                    Real-time DB
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-ms-gray-90 tracking-tight leading-tight">
+              {loading ? 'Loading Event Info...' : eventData?.name || 'MSC Annual Tech Symposium 2026'}
+            </h1>
+
+            <p className="text-base sm:text-lg text-ms-gray-70 leading-relaxed whitespace-pre-line">
+              {eventData?.description ||
+                'Join top student innovators, cloud architects, and tech leaders for hands-on workshops, keynotes, and project showcases.'}
+            </p>
+
+            {/* Event Metadata Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="flex items-start space-x-3 p-3.5 bg-white rounded-lg border border-ms-gray-30 shadow-fluent">
+                <Calendar className="w-5 h-5 text-ms-blue mt-0.5" />
+                <div>
+                  <span className="text-xs font-semibold text-ms-gray-60 uppercase block">Date & Time</span>
+                  <span className="text-sm font-medium text-ms-gray-90">
+                    {eventData?.eventDate ? new Date(eventData.eventDate).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' }) : 'Date TBD'}
                   </span>
                 </div>
+              </div>
 
-                {loading ? (
-                  <div className="py-8 text-center text-ms-gray-60 animate-pulse">Loading live capacity data...</div>
-                ) : error ? (
-                  <div className="p-4 bg-ms-red-subtle text-ms-red-dark rounded text-sm">{error}</div>
-                ) : (
-                  <div className="space-y-6">
-                    {/* Primary Seat Metric */}
-                    <div className="text-center p-6 bg-ms-blue-subtle/50 rounded-lg border border-ms-blue/20">
-                      <span className="text-xs font-semibold text-ms-blue uppercase tracking-wider block">
-                        Available Seats Remaining
-                      </span>
-                      <div className="text-5xl font-black text-ms-blue my-2 tracking-tight">
-                        {eventData?.availableSeats}
-                      </div>
-                      <span className="text-xs text-ms-gray-70">
-                        Out of {eventData?.totalCapacity} Total Allocated Seats
-                      </span>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div>
-                      <div className="flex justify-between text-xs font-medium text-ms-gray-70 mb-1.5">
-                        <span>Confirmed & Allocated ({eventData ? eventData.totalCapacity - eventData.availableSeats : 0})</span>
-                        <span>Capacity ({eventData?.totalCapacity})</span>
-                      </div>
-                      <div className="w-full h-3 bg-ms-gray-30 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-ms-blue transition-all duration-500 rounded-full"
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              eventData
-                                ? ((eventData.totalCapacity - eventData.availableSeats) / eventData.totalCapacity) * 100
-                                : 0
-                            )}%`,
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {/* DB Statistics Grid */}
-                    <div className="grid grid-cols-2 gap-4 text-center text-xs">
-                      <div className="p-3 bg-ms-gray-10 rounded border border-ms-gray-30">
-                        <span className="text-ms-gray-60 block">Confirmed Seats</span>
-                        <span className="text-lg font-bold text-ms-green-dark">{eventData?.confirmedCount}</span>
-                      </div>
-
-                      <div className="p-3 bg-ms-gray-10 rounded border border-ms-gray-30">
-                        <span className="text-ms-gray-60 block">Current Queue</span>
-                        <span className="text-lg font-bold text-amber-700">{eventData?.queueCount}</span>
-                      </div>
-                    </div>
-
-                    <div className="text-xs text-ms-gray-60 text-center leading-relaxed">
-                      * Registrations beyond seat capacity automatically enter the queue. If an allocated seat is declined or expires, queue members are promoted FIFO.
-                    </div>
-                  </div>
-                )}
+              <div className="flex items-start space-x-3 p-3.5 bg-white rounded-lg border border-ms-gray-30 shadow-fluent">
+                <MapPin className="w-5 h-5 text-ms-red mt-0.5" />
+                <div>
+                  <span className="text-xs font-semibold text-ms-gray-60 uppercase block">Venue</span>
+                  <span className="text-sm font-medium text-ms-gray-90">{eventData?.venue || 'Main Auditorium'}</span>
+                </div>
               </div>
             </div>
 
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold rounded bg-ms-blue text-white hover:bg-ms-blue-dark transition-all shadow-fluent-depth-8 hover:shadow-fluent-depth-16"
+              >
+                <span>Register Now</span>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+
+              <a
+                href="#check-status"
+                className="inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold rounded bg-white text-ms-gray-80 border border-ms-gray-40 hover:bg-ms-gray-20 transition-all shadow-sm"
+              >
+                <span>Check Status</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>

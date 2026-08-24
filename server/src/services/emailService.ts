@@ -193,11 +193,17 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
   const noLink = `${getAppUrl()}/confirm/${data.token}/no`;
 
   const html = wrapEmailTemplate(
-    'Action Required: Confirm Your Event RSVP',
+    'Confirm your seat within 1 hour',
     `
-    <span class="badge badge-warning">Action Required — Seat Allocated</span>
+    <span class="badge badge-warning">Confirmation Needed</span>
     <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #334155;">A seat has been allocated for you at <strong>${data.eventName}</strong>! Please RSVP below to confirm your attendance before the deadline.</p>
+    <p style="color: #334155;">We have received your registration request for the event. A seat is currently available for you.</p>
+    <p style="color: #334155;">To confirm your seat, please click <strong>YES, CONFIRM MY SEAT</strong> below within the next 1 hour.</p>
+
+    <div class="btn-container">
+      <a href="${yesLink}" class="btn btn-yes">YES, CONFIRM MY SEAT</a>
+      <a href="${noLink}" class="btn btn-no">NO, I CANNOT ATTEND</a>
+    </div>
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
@@ -206,14 +212,8 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
       <div class="details-row"><span class="label">RSVP Deadline:</span><span class="val" style="color: #dc2626; font-weight:700;">${data.deadlineFormatted}</span></div>
     </div>
 
-    <p style="color: #334155;">Click <strong>YES</strong> to claim your seat and generate your official QR Code ticket pass. If you cannot make it, please click <strong>NO</strong> so your seat can be released to students in the queue.</p>
-
-    <div class="btn-container">
-      <a href="${yesLink}" class="btn btn-yes">YES — I WILL ATTEND</a>
-      <a href="${noLink}" class="btn btn-no">NO — CANCEL SEAT</a>
-    </div>
-
-    <p style="font-size: 12px; color: #64748b; text-align: center;">Single-use RSVP secure token. Valid until ${data.deadlineFormatted}.</p>
+    <p style="color: #334155;">If we do not receive your response within 1 hour, your seat will be given to the next student on the waiting list.</p>
+    <p style="color: #334155; font-size: 13px; font-weight: 500; background: #fffbe9; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin: 15px 0;">⚠️ Please check this email carefully, and also check your spam or junk folder in case our mail lands there.</p>
     `,
     {
       eventName: data.eventName,
@@ -224,7 +224,7 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
     }
   );
 
-  return sendEmail(data.recipientEmail, `[RSVP Required] Confirm Registration for ${data.eventName}`, html);
+  return sendEmail(data.recipientEmail, `Confirm your seat within 1 hour`, html);
 }
 
 /**
@@ -237,23 +237,24 @@ export async function sendQueueEmail(data: {
   queuePosition: number;
 }) {
   const html = wrapEmailTemplate(
-    'Registration Queue Status',
+    'You are on the waiting list',
     `
-    <span class="badge badge-warning">Queue Status</span>
+    <span class="badge badge-warning">Waiting List</span>
     <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #334155;">Thank you for registering for <strong>${data.eventName}</strong>. Maximum initial seat capacity has been reached, so your registration is queued.</p>
+    <p style="color: #334155;">Thank you for registering. All seats for the event are currently full. You have been added to our waiting list.</p>
 
     <div class="details-box" style="text-align: center; padding: 24px; background: #eff6ff; border-color: #bfdbfe;">
-      <p style="margin: 0; font-size: 12px; color: #0369a1; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Your Queue Position</p>
+      <p style="margin: 0; font-size: 12px; color: #0369a1; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Your Position in the Queue</p>
       <h1 style="font-size: 52px; margin: 8px 0; color: #0078D4; font-weight: 800;">#${data.queuePosition}</h1>
       <p style="margin: 0; font-size: 12px; color: #64748b;">Updates automatically as seats open up</p>
     </div>
 
-    <p style="color: #334155;">As students confirm or decline their allocations, seats open up automatically. You will receive an instant RSVP email as soon as a seat becomes available for you.</p>
+    <p style="color: #334155;">If a seat becomes available, we will send you an email. You will then have 1 hour to confirm before the seat is offered to the next person in the queue.</p>
+    <p style="color: #334155; font-size: 13px; font-weight: 500; background: #fffbe9; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin: 15px 0;">⚠️ Please keep checking your email regularly, including your spam or junk folder.</p>
     `
   );
 
-  return sendEmail(data.recipientEmail, `Queue Status: #${data.queuePosition} for ${data.eventName}`, html);
+  return sendEmail(data.recipientEmail, `You are on the waiting list`, html);
 }
 
 /**
@@ -272,25 +273,27 @@ export async function sendQueuePromotionEmail(data: {
   const noLink = `${getAppUrl()}/confirm/${data.token}/no`;
 
   const html = wrapEmailTemplate(
-    'Seat Available: Queue Promotion!',
+    'Confirm your seat within 1 hour',
     `
-    <span class="badge badge-success">Urgent — Seat Available!</span>
-    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Great News ${data.studentName}!</h2>
-    <p style="color: #334155;">A seat has just opened up for you at <strong>${data.eventName}</strong>!</p>
+    <span class="badge badge-warning">Confirmation Needed</span>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">We have received your registration request for the event. A seat is currently available for you.</p>
+    <p style="color: #334155;">To confirm your seat, please click <strong>YES, CONFIRM MY SEAT</strong> below within the next 1 hour.</p>
+
+    <div class="btn-container">
+      <a href="${yesLink}" class="btn btn-yes">YES, CONFIRM MY SEAT</a>
+      <a href="${noLink}" class="btn btn-no">NO, I CANNOT ATTEND</a>
+    </div>
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
-      <div class="details-row"><span class="label">Urgent RSVP Deadline:</span><span class="val" style="color: #dc2626; font-weight: 700;">${data.deadlineFormatted}</span></div>
+      <div class="details-row"><span class="label">RSVP Deadline:</span><span class="val" style="color: #dc2626; font-weight:700;">${data.deadlineFormatted}</span></div>
     </div>
 
-    <p style="color: #334155;">You have a limited window to claim this seat. Please RSVP below immediately:</p>
-
-    <div class="btn-container">
-      <a href="${yesLink}" class="btn btn-yes">YES — I WILL ATTEND</a>
-      <a href="${noLink}" class="btn btn-no">NO — DECLINE SEAT</a>
-    </div>
+    <p style="color: #334155;">If we do not receive your response within 1 hour, your seat will be given to the next student on the waiting list.</p>
+    <p style="color: #334155; font-size: 13px; font-weight: 500; background: #fffbe9; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin: 15px 0;">⚠️ Please check this email carefully, and also check your spam or junk folder in case our mail lands there.</p>
     `,
     {
       eventName: data.eventName,
@@ -301,7 +304,7 @@ export async function sendQueuePromotionEmail(data: {
     }
   );
 
-  return sendEmail(data.recipientEmail, `[Urgent RSVP] Seat Available! Confirm Registration for ${data.eventName}`, html);
+  return sendEmail(data.recipientEmail, `Confirm your seat within 1 hour`, html);
 }
 
 /**
@@ -327,33 +330,31 @@ export async function sendFinalConfirmationWithQR(data: {
     },
   });
 
-  // 2. HTTPS Web Fallback URL (if CID attachment is blocked by security client)
-  const qrFallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.qrToken)}`;
-
   const html = wrapEmailTemplate(
-    'Registration Confirmed — Entry Ticket Pass',
+    'Your registration is confirmed',
     `
-    <span class="badge badge-success">Official Entry Pass</span>
-    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Congratulations ${data.studentName}!</h2>
-    <p style="color: #334155;">Your attendance at <strong>${data.eventName}</strong> is officially confirmed. Below is your official ticket pass with your Unique Ticket ID and Entrance QR Code.</p>
+    <span class="badge badge-success">Registration Confirmed</span>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">Your registration for the event is confirmed. Below are your details.</p>
 
     <div class="qr-card">
       <img src="cid:ticketqrcode" alt="Event Ticket QR Code" style="width: 220px; height: 220px; display: block; margin: 0 auto; border-radius: 12px; background: #ffffff; padding: 12px; border: 1px solid #e2e8f0;" />
       <p style="font-weight: 800; font-size: 24px; letter-spacing: 2px; color: #0078D4; margin: 16px 0 4px 0;">${data.uniqueId}</p>
-      <p style="font-size: 12px; color: #64748b; margin: 0;">Present this QR code or Unique ID at the auditorium entrance</p>
+      <p style="font-size: 12px; color: #64748b; margin: 0;">Your Unique ID (UID): ${data.uniqueId}</p>
     </div>
 
     ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Student Name:</span><span class="val">${data.studentName}</span></div>
-      <div class="details-row"><span class="label">Ticket ID:</span><span class="val" style="color:#0078D4; font-weight:700;">${data.uniqueId}</span></div>
+      <div class="details-row"><span class="label">Unique ID (UID):</span><span class="val" style="color:#0078D4; font-weight:700;">${data.uniqueId}</span></div>
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
       <div class="details-row"><span class="label">Date & Time:</span><span class="val">${data.eventDate}</span></div>
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
     </div>
 
-    <p style="font-size: 13px; color: #64748b; text-align: center;">Please arrive 15 minutes prior to start time. Keep this email saved on your phone for scanner check-in.</p>
+    <p style="color: #334155;">Your entry QR code is attached with this email. Please keep this email safe, as you will need to show the QR code at the entry gate. Our team will scan it to mark your attendance.</p>
+    <p style="color: #334155;">Please reach the venue a little early. Keep your UID and QR code with you and do not share them with anyone else.</p>
     `,
     {
       eventName: data.eventName,
@@ -365,13 +366,13 @@ export async function sendFinalConfirmationWithQR(data: {
 
   return sendEmail(
     data.recipientEmail,
-    `Confirmed Ticket Pass [${data.uniqueId}] for ${data.eventName}`,
+    `Your registration is confirmed`,
     html,
     [
       {
         filename: `ticket-qr-${data.uniqueId}.png`,
         content: qrBuffer,
-        cid: 'ticketqrcode', // Referenced as src="cid:ticketqrcode" in html template
+        cid: 'ticketqrcode',
       },
     ]
   );
@@ -411,7 +412,7 @@ export async function sendRegistrationUpdatedEmail(data: {
       <div class="details-row"><span class="label">Venue:</span><span class="val">${data.venue}</span></div>
     </div>
 
-    <p style="font-size: 13px; color: #64748b; text-align: center;">If you have any questions regarding your registration update, please contact the Microsoft Student Chapter admin team.</p>
+    <p style="font-size: 13px; color: #64748b; text-align: center;">If you have any questions regarding your registration update, please contact the Microsoft Student Community admin team.</p>
     `
   );
 
@@ -427,17 +428,32 @@ export async function sendCancellationNoticeEmail(data: {
   eventName: string;
   reason: string;
 }) {
-  const html = wrapEmailTemplate(
-    'Registration Update',
-    `
-    <span class="badge badge-danger">Seat Released</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #cbd5e1;">Your seat allocation for <strong>${data.eventName}</strong> has been cancelled (${data.reason}).</p>
-    <p style="color: #94a3b8; font-size: 13px;">Thank you for your response. Your seat has been automatically released to the next queued student.</p>
-    `
-  );
+  const isNoResponse =
+    data.reason.toLowerCase().includes('expire') ||
+    data.reason.toLowerCase().includes('no response') ||
+    data.reason.toLowerCase().includes('deadline');
 
-  return sendEmail(data.recipientEmail, `Registration Update for ${data.eventName}`, html);
+  const subject = isNoResponse
+    ? 'Your registration has been cancelled due to no response'
+    : 'Your registration has been cancelled';
+
+  const bodyContent = isNoResponse
+    ? `
+    <span class="badge badge-danger">Registration Cancelled</span>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">We did not receive your confirmation within the 1 hour window given to you. Since we did not hear back in time, your seat has been released and given to the next student on the waiting list.</p>
+    <p style="color: #334155;">You can register for our future events through our WhatsApp community. Please confirm quickly next time, as seats are limited.</p>
+    `
+    : `
+    <span class="badge badge-danger">Registration Cancelled</span>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">As per your response, you informed us that you will not be able to attend the event. Your registration has been cancelled and your seat has been given to the next student on the waiting list.</p>
+    <p style="color: #334155;">You can register for our future events through our WhatsApp community.</p>
+    `;
+
+  const html = wrapEmailTemplate(subject, bodyContent);
+
+  return sendEmail(data.recipientEmail, subject, html);
 }
 
 /**
@@ -449,16 +465,16 @@ export async function sendRegistrationNotAcceptedEmail(data: {
   eventName: string;
 }) {
   const html = wrapEmailTemplate(
-    'Registration Status Notice',
+    'We could not accommodate you this time',
     `
-    <span class="badge">Registration Concluded</span>
-    <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
-    <p style="color: #cbd5e1;">Thank you for your interest in <strong>${data.eventName}</strong>.</p>
-    <p style="color: #cbd5e1;">All available event seats have now been confirmed, and queue processing has concluded. Unfortunately, we are unable to allocate a seat for you at this time.</p>
+    <span class="badge badge-danger">Registration Concluded</span>
+    <h2 style="margin-top: 0; color: #0f172a; font-size: 20px;">Hello ${data.studentName},</h2>
+    <p style="color: #334155;">All seats for this event have been filled and we were not able to accommodate you from the waiting list.</p>
+    <p style="color: #334155;">Thank you for your interest and patience. You can register early for our next event through our WhatsApp community.</p>
     `
   );
 
-  return sendEmail(data.recipientEmail, `Registration Status for ${data.eventName}`, html);
+  return sendEmail(data.recipientEmail, `We could not accommodate you this time`, html);
 }
 
 /**

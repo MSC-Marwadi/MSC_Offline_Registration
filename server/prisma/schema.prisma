@@ -40,7 +40,7 @@ model EventConfig {
   eventDate                    DateTime @default(now())
   venue                        String   @default("Main University Auditorium & Online Stream")
   totalCapacity                Int      @default(100)
-  confirmationWindowHours      Int      @default(24)
+  confirmationWindowHours      Int      @default(1)
   queueConfirmationWindowHours Int      @default(1)
   registrationOpen             Boolean  @default(true)
   updatedAt                    DateTime @updatedAt

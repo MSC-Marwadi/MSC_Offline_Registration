@@ -80,45 +80,8 @@ function getEventPerksHTML(): string {
  */
 function wrapEmailTemplate(
   title: string,
-  bodyContent: string,
-  eventSchema?: {
-    eventName: string;
-    eventDate: string;
-    venue: string;
-    studentName: string;
-    token?: string;
-  }
+  bodyContent: string
 ): string {
-  const jsonLdSchema = eventSchema
-    ? `
-    <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "EventReservation",
-      "reservationNumber": "${eventSchema.token || 'MSC-2026'}",
-      "reservationStatus": "http://schema.org/ReservationConfirmed",
-      "underName": {
-        "@type": "Person",
-        "name": "${eventSchema.studentName}"
-      },
-      "reservationFor": {
-        "@type": "Event",
-        "name": "${eventSchema.eventName}",
-        "startDate": "${new Date().toISOString()}",
-        "location": {
-          "@type": "Place",
-          "name": "${eventSchema.venue}",
-          "address": {
-            "@type": "PostalAddress",
-            "name": "${eventSchema.venue}"
-          }
-        }
-      }
-    }
-    </script>
-    `
-    : '';
-
   return `
   <!DOCTYPE html>
   <html>
@@ -126,7 +89,6 @@ function wrapEmailTemplate(
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    ${jsonLdSchema}
     <style>
       body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 24px; color: #1e293b; }
       .container { max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
@@ -214,14 +176,7 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
 
     <p style="color: #334155;">If we do not receive your response within 1 hour, your seat will be given to the next student on the waiting list.</p>
     <p style="color: #334155; font-size: 13px; font-weight: 500; background: #fffbe9; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin: 15px 0;">⚠️ Please check this email carefully, and also check your spam or junk folder in case our mail lands there.</p>
-    `,
-    {
-      eventName: data.eventName,
-      eventDate: data.eventDate,
-      venue: data.venue,
-      studentName: data.studentName,
-      token: data.token,
-    }
+    `
   );
 
   return sendEmail(data.recipientEmail, `Confirm your seat within 1 hour`, html);
@@ -294,14 +249,7 @@ export async function sendQueuePromotionEmail(data: {
 
     <p style="color: #334155;">If we do not receive your response within 1 hour, your seat will be given to the next student on the waiting list.</p>
     <p style="color: #334155; font-size: 13px; font-weight: 500; background: #fffbe9; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin: 15px 0;">⚠️ Please check this email carefully, and also check your spam or junk folder in case our mail lands there.</p>
-    `,
-    {
-      eventName: data.eventName,
-      eventDate: data.eventDate,
-      venue: data.venue,
-      studentName: data.studentName,
-      token: data.token,
-    }
+    `
   );
 
   return sendEmail(data.recipientEmail, `Confirm your seat within 1 hour`, html);
@@ -355,13 +303,7 @@ export async function sendFinalConfirmationWithQR(data: {
 
     <p style="color: #334155;">Your entry QR code is attached with this email. Please keep this email safe, as you will need to show the QR code at the entry gate. Our team will scan it to mark your attendance.</p>
     <p style="color: #334155;">Please reach the venue a little early. Keep your UID and QR code with you and do not share them with anyone else.</p>
-    `,
-    {
-      eventName: data.eventName,
-      eventDate: data.eventDate,
-      venue: data.venue,
-      studentName: data.studentName,
-    }
+    `
   );
 
   return sendEmail(

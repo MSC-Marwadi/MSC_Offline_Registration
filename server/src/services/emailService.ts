@@ -4,24 +4,31 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const GMAIL_USER = process.env.GMAIL_USER || '';
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || '';
-const APP_URL = process.env.APP_URL || 'http://localhost:5173';
-const FROM_NAME = process.env.EMAIL_FROM_NAME || 'MSC Event Team';
+// Dynamic App URL getter
+function getAppUrl(): string {
+  return (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+}
 
-// Nodemailer transport creation
-const transporter = nodemailer.createTransport({
-  host: process.env.GMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.GMAIL_PORT || '587', 10),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: GMAIL_USER,
-    pass: GMAIL_APP_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+// Dynamic Nodemailer Transport getter
+function getTransporter() {
+  const user = (process.env.GMAIL_USER || 'msc.marwadisupport@gmail.com').trim();
+  const pass = (process.env.GMAIL_APP_PASSWORD || 'wnpviqzyhwnqftpt').trim();
+  const host = (process.env.GMAIL_HOST || 'smtp.gmail.com').trim();
+  const port = parseInt(process.env.GMAIL_PORT || '587', 10);
+
+  return {
+    transporter: nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false },
+    }),
+    user,
+    pass,
+    fromName: process.env.EMAIL_FROM_NAME || 'Department of Computer Engineering • MSC Team',
+  };
+}
 
 /**
  * Helper component rendering event perks for Code To Cloud (Light Fluent Theme)
@@ -160,8 +167,8 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
   token: string;
   deadlineFormatted: string;
 }) {
-  const yesLink = `${APP_URL}/confirm/${data.token}/yes`;
-  const noLink = `${APP_URL}/confirm/${data.token}/no`;
+  const yesLink = `${getAppUrl()}/confirm/${data.token}/yes`;
+  const noLink = `${getAppUrl()}/confirm/${data.token}/no`;
 
   const html = wrapEmailTemplate(
     'Action Required: Confirm Your Event RSVP',
@@ -239,8 +246,8 @@ export async function sendQueuePromotionEmail(data: {
   token: string;
   deadlineFormatted: string;
 }) {
-  const yesLink = `${APP_URL}/confirm/${data.token}/yes`;
-  const noLink = `${APP_URL}/confirm/${data.token}/no`;
+  const yesLink = `${getAppUrl()}/confirm/${data.token}/yes`;
+  const noLink = `${getAppUrl()}/confirm/${data.token}/no`;
 
   const html = wrapEmailTemplate(
     'Seat Available: Queue Promotion!',
@@ -441,10 +448,11 @@ async function sendEmail(
   htmlContent: string,
   attachments?: Array<{ filename: string; content: Buffer; cid?: string }>
 ): Promise<boolean> {
-  // If SMTP is not configured or in development without creds, log gracefully
-  if (!GMAIL_USER || GMAIL_USER === 'your_email@gmail.com' || !GMAIL_APP_PASSWORD) {
+  const { transporter, user, pass, fromName } = getTransporter();
+
+  if (!user || user === 'your_email@gmail.com' || !pass) {
     console.log(`\n======================================================`);
-    console.log(`[SMTP DEV LOG] (Gmail credentials not set in .env)`);
+    console.log(`[SMTP DEV LOG] (Gmail credentials not set)`);
     console.log(`To: ${to}`);
     console.log(`Subject: ${subject}`);
     console.log(`Status: Simulated successful delivery`);
@@ -454,7 +462,7 @@ async function sendEmail(
 
   try {
     const info = await transporter.sendMail({
-      from: `"${FROM_NAME}" <${GMAIL_USER}>`,
+      from: `"${fromName}" <${user}>`,
       to,
       subject,
       html: htmlContent,

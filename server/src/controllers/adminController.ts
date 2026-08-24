@@ -599,7 +599,7 @@ export async function resendEmail(req: AuthenticatedRequest, res: Response): Pro
 
     const config = await getEventConfig();
     const eventName = config.name;
-    const eventDateStr = config.eventDate.toLocaleString('en-US');
+    const eventDateStr = config.eventDate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
     const venueStr = config.venue;
 
     if (reg.status === RegistrationStatus.CONFIRMED || reg.status === RegistrationStatus.PRESENT) {
@@ -630,8 +630,8 @@ export async function resendEmail(req: AuthenticatedRequest, res: Response): Pro
     ) {
       const latestToken = reg.confirmationTokens[0];
       const deadlineStr = reg.confirmationDeadline
-        ? new Date(reg.confirmationDeadline).toLocaleString('en-US')
-        : '24 Hours';
+        ? new Date(reg.confirmationDeadline).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })
+        : '1 Hour';
 
       await enqueueEmail(
         'CONFIRMATION_REQUIRED',

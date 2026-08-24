@@ -183,9 +183,9 @@ export async function registerStudentService(data: {
         },
       });
 
-      const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
+      const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) : 'TBD';
       const venueStr = config?.venue || 'Main Auditorium';
-      const deadlineStr = confirmationDeadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      const deadlineStr = confirmationDeadline.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
       emailToEnqueue = {
         type: 'CONFIRMATION_REQUIRED',
@@ -324,9 +324,9 @@ export async function promoteNextInQueue(): Promise<any> {
     });
 
     const eventName = config?.name || 'MSC Tech Event';
-    const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
+    const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) : 'TBD';
     const venueStr = config?.venue || 'Main Auditorium';
-    const deadlineStr = deadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    const deadlineStr = deadline.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
     emailToEnqueue = {
       type: 'QUEUE_PROMOTION',
@@ -429,7 +429,7 @@ export async function processConfirmationToken(tokenString: string, response: 'y
         },
       });
 
-      const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
+      const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) : 'TBD';
       const venueStr = config?.venue || 'Main Auditorium';
 
       emailToEnqueue = {
@@ -542,7 +542,7 @@ export async function updateRegistrationWithStatusLogic(
     const newStatus = updateFields.status || oldStatus;
     const config = await tx.eventConfig.findFirst();
     const eventName = config?.name || 'MSC Tech Event';
-    const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
+    const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) : 'TBD';
     const venueStr = config?.venue || 'Main Auditorium';
 
     let uniqueId = existing.uniqueId;
@@ -642,7 +642,7 @@ export async function updateRegistrationWithStatusLogic(
           },
         });
 
-        const deadlineStr = confirmationDeadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+        const deadlineStr = confirmationDeadline.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
         emailToEnqueue = {
           type: 'CONFIRMATION_REQUIRED',

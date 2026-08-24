@@ -1,29 +1,30 @@
 services:
   - type: web
-    name: msc-event-system
-    env: node
-    buildCommand: npm run build
-    startCommand: npm start
+    name: msc-offline-registration
+    runtime: node
+    plan: free
+    buildCommand: npm run render-build
+    startCommand: npm run start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: msc-event-db
+          property: connectionString
       - key: APP_URL
         sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: JWT_SECRET
-        generateValue: true
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: GMAIL_HOST
-        value: smtp.gmail.com
-      - key: GMAIL_PORT
-        value: 587
       - key: GMAIL_USER
         sync: false
       - key: GMAIL_APP_PASSWORD
         sync: false
-      - key: EMAIL_FROM_NAME
-        value: "MSC Event Team"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_INITIAL_PASSWORD
+        sync: false
+
+databases:
+  - name: msc-event-db
+    databaseName: msc_event_db
+    user: msc_user
+    plan: free

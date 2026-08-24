@@ -602,7 +602,7 @@ export async function resendEmail(req: AuthenticatedRequest, res: Response): Pro
       await enqueueEmail(
         'FINAL_CONFIRMATION',
         reg.email,
-        `Resent Ticket [${reg.uniqueId}] for ${eventName}`,
+        `Resent Ticket Pass [${reg.uniqueId}] for ${eventName}`,
         {
           recipientEmail: reg.email,
           studentName: reg.fullName,
@@ -620,33 +620,72 @@ export async function resendEmail(req: AuthenticatedRequest, res: Response): Pro
       reg.status === RegistrationStatus.PROMOTED
     ) {
       const latestToken = reg.confirmationTokens[0];
-      if (!latestToken) {
-        res.status(400).json({ success: false, message: 'No confirmation token found.' });
-        return;
-      }
+      const deadlineStr = reg.confirmationDeadline
+        ? new Date(reg.confirmationDeadline).toLocaleString('en-US')
+        : '24 Hours';
 
       await enqueueEmail(
         'CONFIRMATION_REQUIRED',
         reg.email,
-        `[Resent] Confirm Registration for ${eventName}`,
+        `[Resent RSVP] Confirm Registration for ${eventName}`,
         {
           recipientEmail: reg.email,
           studentName: reg.fullName,
           eventName,
           eventDate: eventDateStr,
           venue: venueStr,
-          token: latestToken.token,
-          deadlineFormatted: latestToken.expiresAt.toLocaleString('en-US'),
+          token: latestToken ? latestToken.token : 'token',
+          deadlineFormatted: deadlineStr,
         },
         `resend_token_${reg.id}_${Date.now()}`,
         reg.id
       );
+    } else if (reg.status === RegistrationStatus.QUEUED) {
+      const qPos = reg.queuePosition || 1;
+      await enqueueEmail(
+        'QUEUE_NOTICE',
+        reg.email,
+        `[Resent Queue Status] Position #${qPos} for ${eventName}`,
+        {
+          recipientEmail: reg.email,
+          studentName: reg.fullName,
+          eventName,
+          queuePosition: qPos,
+        },
+        `resend_queue_${reg.id}_${Date.now()}`,
+        reg.id
+      );
+    } else if (reg.status === RegistrationStatus.CANCELLED || reg.status === RegistrationStatus.EXPIRED) {
+      await enqueueEmail(
+        'CANCELLATION',
+        reg.email,
+        `[Resent Notice] Registration Status: ${reg.status} for ${eventName}`,
+        {
+          recipientEmail: reg.email,
+          studentName: reg.fullName,
+          eventName,
+          reason: `Current status is ${reg.status}`,
+        },
+        `resend_cancel_${reg.id}_${Date.now()}`,
+        reg.id
+      );
     } else {
-      res.status(400).json({ success: false, message: `Cannot resend email for status: ${reg.status}` });
-      return;
+      await enqueueEmail(
+        'QUEUE_NOTICE',
+        reg.email,
+        `[Resent Notice] Registration Status for ${eventName}`,
+        {
+          recipientEmail: reg.email,
+          studentName: reg.fullName,
+          eventName,
+          queuePosition: reg.queuePosition || 1,
+        },
+        `resend_generic_${reg.id}_${Date.now()}`,
+        reg.id
+      );
     }
 
-    res.json({ success: true, message: 'Email job enqueued for delivery.' });
+    res.json({ success: true, message: `Email resent successfully to ${reg.email} for status: ${reg.status}` });
   } catch (error: any) {
     console.error('[ADMIN CONTROLLER] resendEmail error:', error);
     res.status(500).json({ success: false, message: 'Failed to resend email.' });

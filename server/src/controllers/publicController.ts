@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { prisma } from '../prisma';
 import { getEventConfig, registerStudentService, processConfirmationToken } from '../services/queueService';
 import { RegistrationStatus } from '../types';
+import { runExpirationCheck } from '../services/expirationWorker';
+import { processEmailQueueAsync } from '../services/emailQueue';
 
 /**
  * GET /api/public/event-info
@@ -9,6 +11,11 @@ import { RegistrationStatus } from '../types';
  */
 export async function getEventInfo(req: Request, res: Response): Promise<void> {
   try {
+    // Run expiration checks asynchronously on landing page load to keep database state clean
+    runExpirationCheck().catch((err) =>
+      console.error('[PUBLIC CONTROLLER] Expiration run check failed:', err)
+    );
+
     const config = await getEventConfig();
 
     const confirmedCount = await prisma.registration.count({
@@ -63,6 +70,11 @@ export async function getEventInfo(req: Request, res: Response): Promise<void> {
  */
 export async function registerStudent(req: Request, res: Response): Promise<void> {
   try {
+    // Run expiration checks asynchronously on registration request
+    runExpirationCheck().catch((err) =>
+      console.error('[PUBLIC CONTROLLER] Expiration run check failed:', err)
+    );
+
     const { fullName, email, enrollmentNumber, grNumber, department, additionalInfo } = req.body;
 
     // Field Validation
@@ -217,5 +229,21 @@ export async function checkRegistrationStatus(req: Request, res: Response): Prom
   } catch (error: any) {
     console.error('[PUBLIC CONTROLLER] checkRegistrationStatus error:', error);
     res.status(500).json({ success: false, message: 'Failed to query registration status.' });
+  }
+}
+
+/**
+ * GET /api/public/cron
+ * Triggers expiration checking and email queue processing. Useful for serverless platforms like Vercel.
+ */
+export async function triggerCron(req: Request, res: Response): Promise<void> {
+  try {
+    console.log('[CRON ROUTE] Executing periodic tasks...');
+    await runExpirationCheck();
+    await processEmailQueueAsync();
+    res.json({ success: true, message: 'Cron tasks executed successfully.' });
+  } catch (error: any) {
+    console.error('[CRON ROUTE] Execution failed:', error);
+    res.status(500).json({ success: false, message: error.message || 'Cron execution failed.' });
   }
 }

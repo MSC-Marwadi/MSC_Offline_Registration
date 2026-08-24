@@ -4,6 +4,7 @@ import {
   registerStudent,
   handleConfirmToken,
   checkRegistrationStatus,
+  triggerCron,
 } from '../controllers/publicController';
 
 const router = Router();
@@ -12,5 +13,6 @@ router.get('/event-info', getEventInfo);
 router.post('/register', registerStudent);
 router.post('/confirm/:token/:response', handleConfirmToken);
 router.get('/check-status', checkRegistrationStatus);
+router.get('/cron', triggerCron);
 
 export default router;

@@ -53,10 +53,10 @@ export async function enqueueEmail(
       },
     });
 
-    // Trigger immediate async processing without blocking
-    processEmailQueueAsync().catch((err) =>
-      console.error('[EMAIL QUEUE] Async process error:', err)
-    );
+    // Process the email queue immediately. We await this so that on serverless
+    // platforms like Vercel, the email is fully sent before the response is returned
+    // and the execution container is suspended.
+    await processEmailQueueAsync();
 
     return job;
   } catch (err) {

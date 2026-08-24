@@ -502,8 +502,9 @@ async function sendEmail(
   }
 
   try {
+    const fromEmail = (process.env.EMAIL_FROM_USER || user).trim();
     const info = await transporter.sendMail({
-      from: `"${fromName}" <${user}>`,
+      from: `"${fromName}" <${fromEmail}>`,
       to,
       subject,
       html: htmlContent,

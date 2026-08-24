@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma';
 import { getEventConfig, registerStudentService, processConfirmationToken } from '../services/queueService';
-import { RegistrationStatus } from '../types';
+import { RegistrationStatus, EmailJobStatus } from '../types';
 import { runExpirationCheck } from '../services/expirationWorker';
 import { processEmailQueueAsync } from '../services/emailQueue';
 
@@ -238,6 +238,20 @@ export async function checkRegistrationStatus(req: Request, res: Response): Prom
  */
 export async function triggerCron(req: Request, res: Response): Promise<void> {
   try {
+    const { clear } = req.query;
+    if (clear === 'true') {
+      console.log('[CRON ROUTE] Clearing all pending/failed email jobs from database...');
+      await prisma.emailJob.deleteMany({
+        where: {
+          status: {
+            in: [EmailJobStatus.PENDING, EmailJobStatus.FAILED, EmailJobStatus.PROCESSING],
+          },
+        },
+      });
+      res.json({ success: true, message: 'Email queue cleared successfully.' });
+      return;
+    }
+
     console.log('[CRON ROUTE] Executing periodic tasks...');
     await runExpirationCheck();
     await processEmailQueueAsync();

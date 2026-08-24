@@ -11,11 +11,15 @@ export const AdminQueue: React.FC = () => {
 
   useEffect(() => {
     fetchQueue();
+    const interval = setInterval(() => {
+      fetchQueue(true);
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchQueue = async () => {
+  const fetchQueue = async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const res = await api.get('/admin/queue');
       if (res.data.success) {
         setQueue(res.data.queue);
@@ -23,7 +27,7 @@ export const AdminQueue: React.FC = () => {
     } catch (err) {
       console.error('Error fetching queue:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
@@ -33,7 +37,8 @@ export const AdminQueue: React.FC = () => {
       const res = await api.post('/admin/queue/promote-manual');
       if (res.data.success) {
         setActionMessage(res.data.message);
-        fetchQueue();
+        fetchQueue(true);
+        setTimeout(() => fetchQueue(true), 300);
       }
     } catch (err: any) {
       setActionMessage(err.response?.data?.message || 'Failed to promote student.');
@@ -66,7 +71,7 @@ export const AdminQueue: React.FC = () => {
 
           <div className="flex items-center space-x-3">
             <button
-              onClick={fetchQueue}
+              onClick={() => fetchQueue()}
               className="p-2 bg-ms-gray-10 border border-ms-gray-30 text-ms-gray-70 hover:text-ms-gray-90 rounded"
               title="Refresh Queue"
             >

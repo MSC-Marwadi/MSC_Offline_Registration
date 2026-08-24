@@ -28,11 +28,16 @@ export const AdminRegistrations: React.FC = () => {
 
   useEffect(() => {
     fetchRegistrations();
+    // Auto-poll every 3 seconds for real-time table updates without manual browser refresh
+    const interval = setInterval(() => {
+      fetchRegistrations(true);
+    }, 3000);
+    return () => clearInterval(interval);
   }, [statusFilter]);
 
-  const fetchRegistrations = async () => {
+  const fetchRegistrations = async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const params: any = {};
       if (statusFilter !== 'ALL') params.status = statusFilter;
       if (search.trim()) params.search = search.trim();
@@ -44,7 +49,7 @@ export const AdminRegistrations: React.FC = () => {
     } catch (err) {
       console.error('Error fetching registrations:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
@@ -60,7 +65,8 @@ export const AdminRegistrations: React.FC = () => {
       const res = await api.post('/admin/registration/cancel', { registrationId: id });
       if (res.data.success) {
         setActionMessage('Registration cancelled successfully.');
-        fetchRegistrations();
+        fetchRegistrations(true);
+        setTimeout(() => fetchRegistrations(true), 300);
         setSelectedReg(null);
       }
     } catch (err: any) {
@@ -75,7 +81,8 @@ export const AdminRegistrations: React.FC = () => {
       const res = await api.delete(`/admin/registration/${id}`);
       if (res.data.success) {
         setActionMessage(res.data.message || 'Registration entry permanently deleted.');
-        fetchRegistrations();
+        fetchRegistrations(true);
+        setTimeout(() => fetchRegistrations(true), 300);
         setSelectedReg(null);
       }
     } catch (err: any) {
@@ -129,7 +136,8 @@ export const AdminRegistrations: React.FC = () => {
       if (res.data.success) {
         setActionMessage('New registration created successfully.');
         setIsCreating(false);
-        fetchRegistrations();
+        fetchRegistrations(true);
+        setTimeout(() => fetchRegistrations(true), 300);
       }
     } catch (err: any) {
       setActionMessage(err.response?.data?.message || 'Failed to create registration.');
@@ -148,7 +156,8 @@ export const AdminRegistrations: React.FC = () => {
       if (res.data.success) {
         setActionMessage('Registration updated successfully.');
         setEditingReg(null);
-        fetchRegistrations();
+        fetchRegistrations(true);
+        setTimeout(() => fetchRegistrations(true), 300);
       }
     } catch (err: any) {
       setActionMessage(err.response?.data?.message || 'Failed to update registration.');

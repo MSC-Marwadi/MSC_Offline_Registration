@@ -90,10 +90,23 @@ export async function processEmailQueueAsync() {
     });
 
     for (const job of pendingJobs) {
-      await prisma.emailJob.update({
-        where: { id: job.id },
-        data: { status: EmailJobStatus.PROCESSING },
+      // Atomic claim to avoid multiple serverless workers/processes picking up and executing the same job
+      const claim = await prisma.emailJob.updateMany({
+        where: {
+          id: job.id,
+          status: {
+            in: [EmailJobStatus.PENDING, EmailJobStatus.FAILED],
+          },
+        },
+        data: {
+          status: EmailJobStatus.PROCESSING,
+        },
       });
+
+      if (claim.count === 0) {
+        // Job was already claimed and is being processed by another concurrently running instance
+        continue;
+      }
 
       try {
         const payload: EmailJobPayload = JSON.parse(job.payload);
@@ -189,6 +202,16 @@ export async function processEmailQueueAsync() {
               status: EmailJobStatus.SENT,
               sentAt: new Date(),
               errorMessage: null,
+            },
+          });
+        } else {
+          // If the service returned false (unsuccessful without throwing error)
+          await prisma.emailJob.update({
+            where: { id: job.id },
+            data: {
+              status: EmailJobStatus.FAILED,
+              retries: job.retries + 1,
+              errorMessage: 'Email service returned unsuccessful status.',
             },
           });
         }

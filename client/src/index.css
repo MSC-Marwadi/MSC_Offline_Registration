@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ms-gray-10 text-ms-gray-90 antialiased font-sans min-h-screen selection:bg-ms-blue selection:text-white;
+  }
+}
+
+/* Fluent-style custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f3f2f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c8c6c4;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a19f9d;
+}

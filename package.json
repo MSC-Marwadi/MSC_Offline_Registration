@@ -1,0 +1,25 @@
+{
+  "name": "msc-event-registration-system",
+  "version": "1.0.0",
+  "description": "Production-Ready Microsoft-Themed Event Registration & Queue Management System",
+  "main": "server/dist/index.js",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:client && npm run build:server",
+    "start": "cd server && npm start",
+    "prisma:generate": "cd server && npx prisma generate",
+    "prisma:migrate": "cd server && npx prisma migrate dev",
+    "seed": "cd server && npm run seed",
+    "test": "cd server && npm test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

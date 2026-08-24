@@ -1,0 +1,46 @@
+{
+  "name": "msc-event-server",
+  "version": "1.0.0",
+  "description": "Backend server for Event Registration and Queue Management System",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon --watch src -e ts --exec ts-node src/index.ts",
+    "build": "tsc && npx prisma generate",
+    "start": "node dist/index.js",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:db-push": "npx prisma db push",
+    "seed": "ts-node prisma/seed.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.0",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.5",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.17",
+    "@types/qrcode": "^1.5.5",
+    "@types/supertest": "^6.0.2",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.4.0",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}

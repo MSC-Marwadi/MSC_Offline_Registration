@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../prisma';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { RegistrationStatus, TokenResponseStatus } from '../types';
-import { promoteNextInQueue, getEventConfig, registerStudentService } from '../services/queueService';
+import { promoteNextInQueue, getEventConfig, registerStudentService, updateRegistrationWithStatusLogic } from '../services/queueService';
 import { enqueueEmail } from '../services/emailQueue';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-msc-event-key-change-in-production';
@@ -415,30 +415,13 @@ export async function adminCancelRegistration(req: AuthenticatedRequest, res: Re
       return;
     }
 
-    await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        status: RegistrationStatus.CANCELLED,
-        queuePosition: null,
-        confirmationDeadline: null,
-      },
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        action: 'ADMIN_CANCELLED_REGISTRATION',
-        registrationId,
-        adminId: req.admin?.adminId,
-        metadata: JSON.stringify({ reason: reason || 'Manual Admin Cancellation' }),
-      },
-    });
-
-    // Trigger queue promotion for released seat
-    promoteNextInQueue().catch((err) =>
-      console.error('[ADMIN CONTROLLER] Queue promotion error after admin cancel:', err)
+    await updateRegistrationWithStatusLogic(
+      registrationId,
+      { status: RegistrationStatus.CANCELLED },
+      (req as any).admin?.adminId
     );
 
-    res.json({ success: true, message: 'Registration cancelled and queue promotion triggered.' });
+    res.json({ success: true, message: 'Registration cancelled, notification email sent, and queue promotion triggered.' });
   } catch (error: any) {
     console.error('[ADMIN CONTROLLER] adminCancelRegistration error:', error);
     res.status(500).json({ success: false, message: 'Failed to cancel registration.' });
@@ -519,20 +502,12 @@ export async function adminCreateRegistration(req: any, res: Response): Promise<
     });
 
     if (status && status !== reg.status) {
-      await prisma.registration.update({
-        where: { id: reg.id },
-        data: { status },
-      });
+      await updateRegistrationWithStatusLogic(
+        reg.id,
+        { status },
+        req.admin?.adminId
+      );
     }
-
-    await prisma.auditLog.create({
-      data: {
-        action: 'ADMIN_MANUAL_REGISTRATION_CREATED',
-        registrationId: reg.id,
-        adminId: req.admin?.adminId,
-        metadata: JSON.stringify({ createdBy: req.admin?.email }),
-      },
-    });
 
     res.status(201).json({ success: true, message: 'Registration created successfully.', registration: reg });
   } catch (error: any) {
@@ -554,27 +529,19 @@ export async function adminUpdateRegistration(req: any, res: Response): Promise<
       return;
     }
 
-    const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        ...(fullName && { fullName: fullName.trim() }),
-        ...(email && { email: email.toLowerCase().trim() }),
-        ...(enrollmentNumber && { enrollmentNumber: enrollmentNumber.trim() }),
-        ...(grNumber && { grNumber: grNumber.trim() }),
-        ...(department && { department: department.trim() }),
-        ...(status && { status }),
-        ...(additionalInfo !== undefined && { additionalInfo }),
+    const updated = await updateRegistrationWithStatusLogic(
+      registrationId,
+      {
+        fullName,
+        email,
+        enrollmentNumber,
+        grNumber,
+        department,
+        status,
+        additionalInfo,
       },
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        action: 'ADMIN_REGISTRATION_UPDATED',
-        registrationId,
-        adminId: req.admin?.adminId,
-        metadata: JSON.stringify({ updatedFields: Object.keys(req.body) }),
-      },
-    });
+      req.admin?.adminId
+    );
 
     res.json({ success: true, message: 'Registration details updated successfully.', registration: updated });
   } catch (error: any) {

@@ -251,25 +251,20 @@ export async function promoteNextInQueue(): Promise<any> {
     }
 
     const deadline = new Date(Date.now() + queueHours * 60 * 60 * 1000);
-    const tokenString = crypto.randomBytes(32).toString('hex');
 
-    // Update promoted registration
+    // Generate Unique ID & QR Token for Direct Confirmation
+    const uniqueId = await generateNextUniqueId(tx);
+    const qrCodeToken = `QR-${uniqueId}-${crypto.randomBytes(16).toString('hex')}`;
+
+    // Update promoted registration directly to CONFIRMED
     const updated = await tx.registration.update({
       where: { id: nextQueued.id },
       data: {
-        status: RegistrationStatus.PROMOTED,
+        status: RegistrationStatus.CONFIRMED,
+        uniqueId: uniqueId,
+        qrCodeToken: qrCodeToken,
         queuePosition: null,
-        confirmationDeadline: deadline,
-      },
-    });
-
-    // Create confirmation token
-    await tx.confirmationToken.create({
-      data: {
-        registrationId: updated.id,
-        token: tokenString,
-        expiresAt: deadline,
-        responseStatus: TokenResponseStatus.PENDING,
+        confirmationDeadline: null,
       },
     });
 
@@ -289,31 +284,30 @@ export async function promoteNextInQueue(): Promise<any> {
     // Audit log
     await tx.auditLog.create({
       data: {
-        action: 'QUEUE_PROMOTED',
+        action: 'QUEUE_PROMOTED_CONFIRMED',
         registrationId: updated.id,
-        metadata: JSON.stringify({ deadline, newQueueLength: remainingQueue.length }),
+        metadata: JSON.stringify({ uniqueId, newQueueLength: remainingQueue.length }),
       },
     });
 
     const eventName = config?.name || 'MSC Tech Event';
     const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
     const venueStr = config?.venue || 'Main Auditorium';
-    const deadlineStr = deadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
     emailToEnqueue = {
-      type: 'QUEUE_PROMOTION',
+      type: 'FINAL_CONFIRMATION',
       to: updated.email,
-      subject: `[Urgent] Seat Available! Confirm Registration for ${eventName}`,
+      subject: `Confirmed Ticket [${uniqueId}] for ${eventName}`,
       payload: {
         recipientEmail: updated.email,
         studentName: updated.fullName,
         eventName,
         eventDate: eventDateStr,
         venue: venueStr,
-        token: tokenString,
-        deadlineFormatted: deadlineStr,
+        uniqueId,
+        qrToken: qrCodeToken,
       },
-      key: `promo_${updated.id}_${tokenString.substring(0, 8)}`,
+      key: `promo_final_${updated.id}_${uniqueId}`,
       regId: updated.id,
     };
 
@@ -484,4 +478,206 @@ export async function processConfirmationToken(tokenString: string, response: 'y
   }
 
   return result;
+}
+
+/**
+ * Updates a registration's details and triggers all status transition side-effects 
+ * (email notifications, unique ID generation, ticket passes, queue promotions).
+ */
+export async function updateRegistrationWithStatusLogic(
+  id: string,
+  updateFields: {
+    fullName?: string;
+    email?: string;
+    enrollmentNumber?: string;
+    grNumber?: string;
+    department?: string;
+    status?: RegistrationStatus;
+    additionalInfo?: string;
+  },
+  adminId?: string
+) {
+  let emailToEnqueue: any = null;
+  let triggerQueuePromotion = false;
+
+  const updatedReg = await prisma.$transaction(async (tx) => {
+    const existing = await tx.registration.findUnique({ where: { id } });
+    if (!existing) throw new Error('Registration not found.');
+
+    const oldStatus = existing.status;
+    const newStatus = updateFields.status || oldStatus;
+    const config = await tx.eventConfig.findFirst();
+    const eventName = config?.name || 'MSC Tech Event';
+    const eventDateStr = config?.eventDate ? new Date(config.eventDate).toLocaleString('en-US') : 'TBD';
+    const venueStr = config?.venue || 'Main Auditorium';
+
+    let uniqueId = existing.uniqueId;
+    let qrCodeToken = existing.qrCodeToken;
+    let queuePosition = existing.queuePosition;
+    let confirmationDeadline = existing.confirmationDeadline;
+
+    // Check if status has changed
+    if (newStatus !== oldStatus) {
+      const hadSeat = [
+        RegistrationStatus.CONFIRMED,
+        RegistrationStatus.CONFIRMATION_PENDING,
+        RegistrationStatus.PRESENT,
+        RegistrationStatus.PROMOTED,
+      ].includes(oldStatus as any);
+
+      if (newStatus === RegistrationStatus.CONFIRMED) {
+        if (!uniqueId) {
+          uniqueId = await generateNextUniqueId(tx);
+        }
+        if (!qrCodeToken) {
+          qrCodeToken = `QR-${uniqueId}-${crypto.randomBytes(16).toString('hex')}`;
+        }
+        queuePosition = null;
+        confirmationDeadline = null;
+
+        emailToEnqueue = {
+          type: 'FINAL_CONFIRMATION',
+          to: updateFields.email || existing.email,
+          subject: `Confirmed Ticket Pass [${uniqueId}] for ${eventName}`,
+          payload: {
+            recipientEmail: updateFields.email || existing.email,
+            studentName: updateFields.fullName || existing.fullName,
+            eventName,
+            eventDate: eventDateStr,
+            venue: venueStr,
+            uniqueId,
+            qrToken: qrCodeToken,
+          },
+          key: `status_confirm_${id}_${uniqueId}`,
+          regId: id,
+        };
+      } else if (newStatus === RegistrationStatus.CANCELLED || newStatus === RegistrationStatus.EXPIRED) {
+        queuePosition = null;
+        confirmationDeadline = null;
+
+        emailToEnqueue = {
+          type: 'CANCELLATION',
+          to: updateFields.email || existing.email,
+          subject: `Registration Status Update for ${eventName}`,
+          payload: {
+            recipientEmail: updateFields.email || existing.email,
+            studentName: updateFields.fullName || existing.fullName,
+            eventName,
+            reason: `Status updated to ${newStatus}`,
+          },
+          key: `status_cancel_${id}`,
+          regId: id,
+        };
+
+        if (hadSeat) {
+          triggerQueuePromotion = true;
+        }
+      } else if (newStatus === RegistrationStatus.QUEUED) {
+        const currentQueuedCount = await tx.registration.count({
+          where: { status: RegistrationStatus.QUEUED },
+        });
+        queuePosition = currentQueuedCount + 1;
+        uniqueId = null;
+        qrCodeToken = null;
+        confirmationDeadline = null;
+
+        emailToEnqueue = {
+          type: 'QUEUE_NOTICE',
+          to: updateFields.email || existing.email,
+          subject: `Queue Status: #${queuePosition} for ${eventName}`,
+          payload: {
+            recipientEmail: updateFields.email || existing.email,
+            studentName: updateFields.fullName || existing.fullName,
+            eventName,
+            queuePosition,
+          },
+          key: `status_queue_${id}`,
+          regId: id,
+        };
+
+        if (hadSeat) {
+          triggerQueuePromotion = true;
+        }
+      } else if (newStatus === RegistrationStatus.CONFIRMATION_PENDING || newStatus === RegistrationStatus.PROMOTED) {
+        const windowHours = config ? config.confirmationWindowHours : 24;
+        confirmationDeadline = new Date(Date.now() + windowHours * 60 * 60 * 1000);
+        const tokenString = crypto.randomBytes(32).toString('hex');
+
+        await tx.confirmationToken.create({
+          data: {
+            registrationId: id,
+            token: tokenString,
+            expiresAt: confirmationDeadline,
+            responseStatus: TokenResponseStatus.PENDING,
+          },
+        });
+
+        const deadlineStr = confirmationDeadline.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+        emailToEnqueue = {
+          type: 'CONFIRMATION_REQUIRED',
+          to: updateFields.email || existing.email,
+          subject: `[Action Required] Confirm Registration for ${eventName}`,
+          payload: {
+            recipientEmail: updateFields.email || existing.email,
+            studentName: updateFields.fullName || existing.fullName,
+            eventName,
+            eventDate: eventDateStr,
+            venue: venueStr,
+            token: tokenString,
+            deadlineFormatted: deadlineStr,
+          },
+          key: `status_pending_${id}`,
+          regId: id,
+        };
+      }
+    }
+
+    const updated = await tx.registration.update({
+      where: { id },
+      data: {
+        ...(updateFields.fullName && { fullName: updateFields.fullName.trim() }),
+        ...(updateFields.email && { email: updateFields.email.toLowerCase().trim() }),
+        ...(updateFields.enrollmentNumber && { enrollmentNumber: updateFields.enrollmentNumber.trim() }),
+        ...(updateFields.grNumber && { grNumber: updateFields.grNumber.trim() }),
+        ...(updateFields.department && { department: updateFields.department.trim() }),
+        status: newStatus,
+        uniqueId,
+        qrCodeToken,
+        queuePosition,
+        confirmationDeadline,
+        ...(updateFields.additionalInfo !== undefined && { additionalInfo: updateFields.additionalInfo }),
+      },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        action: 'ADMIN_REGISTRATION_STATUS_UPDATED',
+        registrationId: id,
+        adminId,
+        metadata: JSON.stringify({ oldStatus, newStatus, updatedFields: Object.keys(updateFields) }),
+      },
+    });
+
+    return updated;
+  });
+
+  if (emailToEnqueue) {
+    await enqueueEmail(
+      emailToEnqueue.type,
+      emailToEnqueue.to,
+      emailToEnqueue.subject,
+      emailToEnqueue.payload,
+      emailToEnqueue.key,
+      emailToEnqueue.regId
+    );
+  }
+
+  if (triggerQueuePromotion) {
+    promoteNextInQueue().catch((err) =>
+      console.error('[STATUS TRANSITION] Queue promotion error:', err)
+    );
+  }
+
+  return updatedReg;
 }

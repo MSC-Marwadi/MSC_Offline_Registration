@@ -80,7 +80,7 @@ export async function processEmailQueueAsync() {
           in: [EmailJobStatus.PENDING, EmailJobStatus.FAILED],
         },
         retries: {
-          lt: 3, // retry limit of 3
+          lt: 10, // retry limit up to 10
         },
       },
       take: 10, // process in small batches

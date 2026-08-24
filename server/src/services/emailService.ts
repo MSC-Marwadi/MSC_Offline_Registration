@@ -30,7 +30,7 @@ function getEventPerksHTML(): string {
   return `
   <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1px solid #3b82f6; border-radius: 12px; padding: 20px; margin: 24px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
     <div style="margin-bottom: 12px;">
-      <span style="font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px;">🎁 What You'll Get at Code To Cloud</span>
+      <span style="font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px;">🎁 Department of Computer Engineering Presents Code To Cloud</span>
     </div>
     <div style="font-size: 14px; color: #e2e8f0; line-height: 1.8;">
       <div style="margin-bottom: 6px;">💰 <strong style="color: #4ade80;">$100 Azure Credit</strong> — Free cloud credit for hands-on deployment</div>
@@ -125,15 +125,15 @@ function wrapEmailTemplate(
   <body>
     <div class="container">
       <div class="hero-header">
-        <span class="subtitle">Microsoft Student Community • Marwadi University</span>
+        <span class="subtitle">Department of Computer Engineering • Microsoft Student Community</span>
         <h1>Code To Cloud</h1>
       </div>
       <div class="content">
         ${bodyContent}
       </div>
       <div class="footer">
-        <p style="margin: 0 0 8px 0; font-weight: 600; color: #94a3b8;">Microsoft Student Community • Marwadi University</p>
-        <p style="margin: 0;">Code To Cloud — Hands-On Azure Workshop &copy; 2026</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600; color: #94a3b8;">Department of Computer Engineering • Microsoft Student Community</p>
+        <p style="margin: 0; color: #64748b;">Marwadi University, Rajkot • Code To Cloud Workshop &copy; 2026</p>
       </div>
     </div>
   </body>
@@ -162,8 +162,6 @@ export async function sendRegistrationSuccessfulConfirmationRequired(data: {
     <span class="badge badge-warning">Action Required — Seat Allocated</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
     <p style="color: #cbd5e1;">A seat has been allocated for you at <strong>${data.eventName}</strong>! Please RSVP below to confirm your attendance before the deadline.</p>
-
-    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
@@ -215,8 +213,6 @@ export async function sendQueueEmail(data: {
       <p style="margin: 0; font-size: 12px; color: #64748b;">Updates automatically as seats open up</p>
     </div>
 
-    ${getEventPerksHTML()}
-
     <p style="color: #cbd5e1;">As students confirm or decline their allocations, seats open up automatically. You will receive an instant RSVP email as soon as a seat becomes available for you.</p>
     `
   );
@@ -245,8 +241,6 @@ export async function sendQueuePromotionEmail(data: {
     <span class="badge badge-success">Urgent — Seat Available!</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Great News ${data.studentName}!</h2>
     <p style="color: #cbd5e1;">A seat has just opened up for you at <strong>${data.eventName}</strong>!</p>
-
-    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Event:</span><span class="val">${data.eventName}</span></div>
@@ -368,8 +362,6 @@ export async function sendRegistrationUpdatedEmail(data: {
     <span class="badge badge-warning">Record Updated</span>
     <h2 style="margin-top: 0; color: #f8fafc; font-size: 20px;">Hello ${data.studentName},</h2>
     <p style="color: #cbd5e1;">Your registration details for <strong>${data.eventName}</strong> have been updated by the event administrator.</p>
-
-    ${getEventPerksHTML()}
 
     <div class="details-box">
       <div class="details-row"><span class="label">Full Name:</span><span class="val">${data.studentName}</span></div>
